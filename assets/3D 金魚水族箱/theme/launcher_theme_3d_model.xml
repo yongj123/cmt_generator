@@ -1,0 +1,233 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Theme effect="sphere" version="1">
+    <Wallpaper name="elementWallpaper">
+    <Group name="root">
+        <Group name="bgGroup">
+
+            <Image name="bgImage_1" x="0" y="0" texture="bg_1_texture" width="-1" height="-1">
+            </Image>
+
+            <Script>
+                <Function action="onDrawStart">
+                    <!-- 根据系统时间切换背景 -->
+                    <!-- <CallMethod model="bgImage_1" method="setAlpha" args="255" /> -->
+                    <CallMethod model="bgImage_1" method="setAlpha" args="255" />
+                    <!-- <CallMethod model="bgImage_3" method="setAlpha" args="0" /> -->
+                    <!--
+                    <CallMethod target="condi1" model="TimeDate" method="isCurrentInTimeScope" args="5,0,12,0"/>
+                    <IF judge="condi1"/>
+                        <CallMethod model="bgImage_1" method="setAlpha" args="255" />
+                        <CallMethod model="bgImage_2" method="setAlpha" args="0" />
+                        <CallMethod model="bgImage_3" method="setAlpha" args="0" />
+                    <ENDIF/>
+
+                    <CallMethod target="condi2" model="TimeDate" method="isCurrentInTimeScope" args="12,1,21,00"/>
+                    <IF judge="condi2"/>
+                        <CallMethod model="bgImage_1" method="setAlpha" args="0" />
+                        <CallMethod model="bgImage_2" method="setAlpha" args="255" />
+                        <CallMethod model="bgImage_3" method="setAlpha" args="0" />
+                    <ENDIF/>
+
+                    <CallMethod target="condi3" model="TimeDate" method="isCurrentInTimeScope" args="21,1,4,59"/>
+                    <IF judge="condi3"/>
+                        <CallMethod model="bgImage_1" method="setAlpha" args="0" />
+                        <CallMethod model="bgImage_2" method="setAlpha" args="0" />
+                        <CallMethod model="bgImage_3" method="setAlpha" args="255" />
+                    <ENDIF/>-->
+                </Function>
+            </Script>
+
+        </Group>
+
+        <Group name="koiGroup">
+            <Model name="koi_1" modelType="DAE" modelfile="dae_koi" x="-200" z="300" texture="koi_body_texture_1" animationMode="LOOP" facetype="0" depthTestEnabled="true">
+                <Script>
+                    <Function action="init">
+                        <CallMethod model="koi_1" method="setRotationX" args="90"/>
+                        <CallMethod model="koi_1" method="setRotationZ" args="180"/>
+                        <CallMethod model="koi_1" method="setScale" args="120"/>
+                    </Function>
+
+                    <Function action="onDrawStart">
+                        <CallMethod model="koi_1" method="setRotationZ" args="koi_1Rotation"/>
+
+                        <Command target="koi_1Rotation" value="koi_1Rotation+koi_1RotationSpeed"/>
+
+                        <!-- Swiping -->
+                        <IF judge="mainEffectRunning" />
+                            <IF judge="koi_1RotationSpeed>koi_1RotationSpeedMax" />
+                                <Command target="koi_1RotationSpeed" value="koi_1RotationSpeed-0.3"/>
+                            <ELSE/>
+                                <Command target="iskoi1SlowDown" value="true"/>
+                            <ENDIF/>
+                        <ELSE/>
+                                <IF judge="koi_1RotationSpeedMin>koi_1RotationSpeed" />
+                                    <Command target="koi_1RotationSpeed" value="koi_1RotationSpeed+0.08"/>
+                                <ELSE/>
+                                    <Command target="iskoi1SlowDown" value="false"/>
+                                    <Command target="koi_1RotationSpeed" value="koi_1RotationSpeedMin"/>
+                                <ENDIF/>
+                        <ENDIF/>
+                        
+                    </Function>
+                </Script>
+            </Model>
+
+             <Model name="koi_2" modelType="DAE" modelfile="dae_koi" x="100" y="-100" z="0" texture="koi_body_texture_1" animationMode="LOOP" facetype="0" depthTestEnabled="true">
+                <Script>
+                    <Function action="init">
+                        <CallMethod model="koi_2" method="setRotationX" args="90"/>
+                        <CallMethod model="koi_2" method="setRotationY" args="0"/>
+                        <CallMethod model="koi_2" method="setRotationZ" args="180"/>
+                        <CallMethod model="koi_2" method="setScale" args="80"/>
+                    </Function>
+
+                    <Function action="onDrawStart">
+                        <CallMethod model="koi_2" method="setRotationZ" args="60+koi_2Rotation"/>
+
+                        <Command target="koi_2Rotation" value="koi_2Rotation+koi_2RotationSpeed"/>
+
+                        <!-- Swiping -->
+                        
+						<IF judge="mainEffectRunning" />
+                            <IF judge="koi_2RotationSpeed>koi_2RotationSpeedMax" />
+                                <Command target="koi_2RotationSpeed" value="koi_2RotationSpeed-0.2"/>
+                            <ELSE/>
+                                <Command target="iskoi2SlowDown" value="true"/>
+                            <ENDIF/>
+                        <ELSE/>
+                                <IF judge="koi_2RotationSpeedMin>koi_2RotationSpeed" />
+                                    <Command target="koi_2RotationSpeed" value="koi_2RotationSpeed+0.06"/>
+                                <ELSE/>
+                                    <Command target="iskoi2SlowDown" value="false"/>
+                                    <Command target="koi_2RotationSpeed" value="koi_2RotationSpeedMin"/>
+                                <ENDIF/>
+                        <ENDIF/>
+
+                        
+                    </Function>
+                </Script>
+            </Model> 
+
+             <Model name="koi_3" modelType="DAE" modelfile="dae_koi" x="0" y="200" z="100" texture="koi_body_texture_1" animationMode="LOOP" facetype="0" depthTestEnabled="true">
+                <Script>
+                    <Function action="init">
+                        <CallMethod model="koi_3" method="setRotationX" args="90"/>
+                        <CallMethod model="koi_3" method="setRotationY" args="0"/>
+                        <CallMethod model="koi_3" method="setRotationZ" args="180"/>
+                        <CallMethod model="koi_3" method="setScale" args="100"/>
+                    </Function>
+
+                    <Function action="onDrawStart">
+                        <CallMethod model="koi_3" method="setRotationZ" args="200+koi_3Rotation"/>
+
+                        <Command target="koi_3Rotation" value="koi_3Rotation+koi_3RotationSpeed"/> 
+
+                        <!-- Swiping -->
+                       <IF judge="mainEffectRunning" />
+                            <IF judge="koi_3RotationSpeed>koi_3RotationSpeedMax" />
+                                <Command target="koi_3RotationSpeed" value="koi_3RotationSpeed-0.25"/>
+                            <ELSE/>
+                                <Command target="iskoi3SlowDown" value="true"/>
+                            <ENDIF/>
+                        <ELSE/>
+                                <IF judge="koi_3RotationSpeedMin>koi_3RotationSpeed" />
+                                    <Command target="koi_3RotationSpeed" value="koi_3RotationSpeed+0.05"/>
+                                <ELSE/>
+                                    <Command target="iskoi3SlowDown" value="false"/>
+                                    <Command target="koi_3RotationSpeed" value="koi_3RotationSpeedMin"/>
+                                <ENDIF/>
+                        <ENDIF/>
+
+                        
+                    </Function>
+                </Script>
+            </Model> 
+        </Group> 
+            <WaterRipple name="water" >
+            </WaterRipple>                      
+    </Group>
+
+        <!-- 自动随机出现水波纹 -->
+        <Timer name="TimerA" delay="1000" period="3000">
+          <Script>
+              <Function action="task">
+                <CallMethod target="h" model="Math" method="getRandom" args="1920"/>
+                <CallMethod target="w" model="Math" method="getRandom" args="1080"/>
+                <CallMethod model="water" method="triggerWater" args="w,h"/>
+              </Function>
+          </Script>
+        </Timer>
+        <Script>
+            <Function action="init">
+                <CallMethod model="TimerA" method="start"/>
+            </Function>
+
+            <Function action="onPause">
+                <CallMethod model="TimerA" method="stop"/>
+            </Function>
+
+            <Function action="onResume">
+                <CallMethod model="TimerA" method="start"/>
+            </Function>
+        </Script>
+       
+        <Script>
+            <!-- 摄像机变量 -->
+            <ValueInterpolator name="cCameraRotationX" speed="0.175" />
+            <ValueInterpolator name="vICameraRotationX" speed="0.175" />
+
+            <GlobalVar name="koi_1Rotation" type="float" value="-0.12"/>
+            <GlobalVar name="koi_1RotationSpeed" type="float" value="1"/>
+            <GlobalVar name="koi_1RotationSpeedMax" type="float" value="-4.4"/>
+            <GlobalVar name="koi_1RotationSpeedMin" type="float" value="-0.12"/>
+            <GlobalVar name="iskoi1SlowDown" type="boolean" value="false" />
+
+            <GlobalVar name="koi_2Rotation" type="float" value="0"/>
+            <GlobalVar name="koi_2RotationSpeed" type="float" value="-0.15"/>
+            <GlobalVar name="koi_2RotationSpeedMax" type="float" value="-4.6"/>
+            <GlobalVar name="koi_2RotationSpeedMin" type="float" value="-0.15"/>
+            <GlobalVar name="iskoi2SlowDown" type="boolean" value="false" />
+
+            <GlobalVar name="koi_3Rotation" type="float" value="0"/>
+            <GlobalVar name="koi_3RotationSpeed" type="float" value="-0.18"/>
+            <GlobalVar name="koi_3RotationSpeedMax" type="float" value="-4.8"/>
+            <GlobalVar name="koi_3RotationSpeedMin" type="float" value="-0.18"/>
+            <GlobalVar name="iskoi3SlowDown" type="boolean" value="false" />
+
+
+            <!-- 手势跟随变量 -->
+            <GlobalVar name="mainEffectRunning" type="boolean" value="false" />
+
+            <GlobalVar name="rotationX" type="float" value="0"/>
+
+
+            <!-- 开始绘制wallpaper -->
+            <Function action="drawWallpaper">
+                <Var name="scaleUnit" type="float" value="0" />
+                <Command target="scaleUnit" value="drawWallpaper_width/1080f"/>
+                <CallMethod model="cCameraRotationX" method="step"/>
+
+                <CallMethod model="root" method="dispatchDraw"/>
+            </Function>
+
+            <!-- 滑屏动效开始 -->
+            <Function action="onDesktopEffectStart">
+                <Command target="mainEffectRunning" value="true" />
+
+            </Function>
+
+            <!-- 滑屏动效结束 -->
+            <Function action="onDesktopEffectEnd">
+                <Command target="mainEffectRunning" value="false" />
+            </Function>
+
+        </Script>
+
+    </Wallpaper>
+
+
+	<ElementEffectCore name="effectcore">
+
+	</ElementEffectCore>
+</Theme>

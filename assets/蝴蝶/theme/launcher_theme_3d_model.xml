@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Theme effect="sphere" version="1">
+    <!--Wallpaper ���ƶ�̬��ֽ-->
+    <Wallpaper name="elementWallpaper">
+
+        <Group name="group">
+            <Model name="Wall" modelType="OBJ" modelfile="model_wall" x="0" y="0" z="0" width="1000" height="1000" texture="wall_texture" scale="5" facetype="1">
+                <Script>
+                    <Function action="init">
+                        <CallMethod model="Wall" method="setY" args="[wall_xxhdpi]"/>
+                        <Method name="wall_xxhdpi" model="ThemeVariable" method="xxhdpi" args="0-200"/>
+                    </Function>
+                </Script>
+            </Model>
+            <Image name="bottom" width="1000" height="1000" texture="dock_bottom_texture" scale="1" rotationx="-90">
+                <Script>
+                    <GlobalVar name="angle" type="float" value="0"/>
+                    <Function action="onDrawStart">
+                        <CallMethod model="bottom" method="setY" args="[getCanvasBottom]+[bottom_xxhdpi]"/>
+                        <CallMethod model="bottom" method="setRotationZ" args="angle"/>
+                        <Command name="setAngle" target="angle" value="angle-0.3"/>
+                        <Method name="getCanvasBottom" model="ThemeVariable" method="getCanvasBottom"/>
+                        <Method name="bottom_xxhdpi" model="ThemeVariable" method="xxhdpi" args="250"/>
+                    </Function>
+                </Script>
+            </Image>
+
+            <Model name="dock" modelType="OBJ" modelfile="model_dock" texture="dock_texture" scale="3" depthTestEnabled="true" >
+                <Script>
+                    <Function action="onDrawStart">
+                        <CallMethod model="dock" method="setY" args="[getCanvasBottom]+[distance_xxhdpi]"/>
+                        <Method name="distance_xxhdpi" model="ThemeVariable" method="xxhdpi" args="310"/>
+                        <Method name="getCanvasBottom" model="ThemeVariable" method="getCanvasBottom"/>
+                    </Function>
+                </Script>
+            </Model>
+
+            <Script>
+                <Function action="onDrawStart">
+                    <Var name="targetRotationY" type="float" value="0"/>
+                    <Command target="targetRotationY" value="[wallpaperPrecent]*360+wallpaperAngle" />
+                    <Method name="wallpaperPrecent" model="elementWallpaper" method="getWallpaperPrecent"/>
+                    <Command target="targetRotationY" value="[rotationY]"/>
+                    <Method name="rotationY" model="Calculate" method="nextAngle" args="[vICRotationY],targetRotationY" />
+                    <Method name="vICRotationY" model="vICameraRotationY" method="getValue"/>
+                    <CallMethod model="vICameraRotationY" method="setTargetValue" args="targetRotationY"/>
+                    <CallMethod model="vICameraRotationY" method="step"/>
+                    <CallMethod model="group" method="setRotationY" args="[cRotationY]"/>
+                    <Method name="cRotationY" model="vICameraRotationY" method="getValue" />
+                    <CallMethod model="vICameraRotationX" method="step"/>
+                    <CallMethod model="group" method="setRotationX" args="[cRotationX]"/>
+                    <Method name="cRotationX" model="vICameraRotationX" method="getValue" />
+                </Function>
+            </Script>
+        </Group>
+        
+        <ValueInterpolator name="vICameraRotationY" speed="0.175" />
+        <ValueInterpolator name="vICameraRotationX" speed="0.175" />
+        <Script>
+            <GlobalVar name="sourceWallpaperAngle" type="float" value="0"/>
+            <GlobalVar name="wallpaperAngle" type="float" value="0"/>
+            <Function action="onIconStartDrag">
+                <Command target="sourceWallpaperAngle" value="wallpaperAngle"/>
+            </Function>
+            <Function action="onSensorChanged">
+                <Var name="sensorY" type="float" value="0"/>
+                <Var name="sensor_min" type="float" value="0"/>
+                <Var name="sensor_max" type="float" value="9"/>
+                <IF judge="sensor_min>onSensorChanged_sensorY"/>
+                    <Command target="sensorY" value="0"/>
+                <ELSE/>
+                    <Command target="sensorY" value="onSensorChanged_sensorY"/>
+                <ENDIF/>
+                <IF judge="sensor_min>onSensorChanged_sensorZ"/>
+                    <IF judge="sensor_max>sensorY"/>
+                        <Command target="sensorY" value="sensor_max"/>
+                    <ENDIF/>
+                <ENDIF/>
+                <Var name="rotationX" type="float" value="0"/>
+                <IF judge="onSensorChanged_sensorZ>sensor_min"/>
+                    <Command target="rotationX" value="90*(9.78-sensorY)/10"/>
+                <ELSE/>
+                    <Command target="rotationX" value="90*(sensorY-9.78)/10"/>
+                <ENDIF/>
+                <CallMethod model="vICameraRotationX" method="setTargetValue" args="rotationX"/>
+            </Function>
+            <Function action="drawWallpaper">
+                <Var name="isIconDraging" type="boolean" value="flase" />
+                <Command target="isIconDraging" value="[getIconDraging]" />
+                <Method name="getIconDraging" model="ThemeEvent" method="isIconDraging"/>
+                <IF judge="isIconDraging"/>
+                    <Var name="dragOffsetX" type="float" value="0"/>
+                    <Var name="rotationOffsetX" type="float" value="0"/>
+                    <Command target="dragOffsetX" value="[dragIconX]-[iconStartX]"/>
+                    <Command target="rotationOffsetX" value="dragOffsetX/[canvasWidth]"/>
+                    <Command target="wallpaperAngle" value="sourceWallpaperAngle+360*rotationOffsetX"/>
+                    <Method name="dragIconX" model="ThemeVariable" method="getDragIconX" />
+                    <Method name="iconStartX" model="ThemeVariable" method="getDragIconStartX" />
+                    <Method name="canvasWidth" model="ThemeVariable" method="getCanvasWidth" />
+                <ENDIF/>
+                <Var name="scaleUnit" type="float" value="0" />
+                <Command target="scaleUnit" value="drawWallpaper_width/1080f"/>
+                <CallMethod model="Wall" method="setScaleUnit" args="scaleUnit"/>
+                <CallMethod model="dock" method="setScaleUnit" args="scaleUnit"/>
+                <CallMethod model="bottom" method="setScaleUnit" args="scaleUnit"/>
+                <CallMethod model="group" method="dispatchDraw" args="drawWallpaper_Matrix" argsType="object"/>
+            </Function>
+        </Script>
+    </Wallpaper>
+
+	<ElementEffectCore name="effectcore">
+
+        <Model name="ball" modelType="OBJ" modelfile="model_ball" texture="outer_ball_texture" facetype="1" depthTestEnabled="true">
+
+            <Script>
+                <GlobalVar name="valueBallRotationX" type="float" value="0" />
+                <GlobalVar name="valueBallRotationY" type="float" value="0" />
+                <GlobalVar name="valueBallSourceRotationX" type="float" value="0" />
+                <GlobalVar name="valueBallSourceRotationY" type="float" value="0" />
+                <GlobalVar name="valueBallStartWallpaperOffset" type="float" value="0" />
+                <GlobalVar name="valueBallTweenLightModeFrame" type="int" value="0" />
+                <GlobalVar name="valueBallDragingIcon" type="boolean" value="false" />
+                <GlobalVar name="valueBallEffectRunning" type="boolean" value="false" />
+                
+                <Function action="onIconStartDrag">
+                    <Command target="valueBallDragingIcon" value="true" />
+                    <Command target="valueBallTweenLightModeFrame" value="0" />
+                    <Command target="valueBallStartWallpaperOffset" value="[wallpaperOffset]" />
+                    <Command target="valueBallSourceRotationX" value="valueBallRotationX" />
+                    <Command target="valueBallSourceRotationY" value="valueBallRotationY" />
+                    <Method name="wallpaperOffset" model="elementWallpaper" method="getWallpaperPrecent" />
+                </Function>
+
+                <Function action="onIconEndDrag">
+                    <Command target="valueBallDragingIcon" value="false" />
+                </Function>
+
+                <Function action="onDesktopEffectStart">
+                    <Command target="valueBallEffectRunning" value="true" />
+                    <Command target="valueBallStartWallpaperOffset" value="[wallpaperOffset]" />
+                    <Command target="valueBallSourceRotationX" value="valueBallRotationX" />
+                    <Command target="valueBallSourceRotationY" value="valueBallRotationY" />
+                    <Method name="wallpaperOffset" model="elementWallpaper" method="getWallpaperPrecent" />
+                </Function>
+
+                <Function action="onDesktopEffectEnd">
+                    <Command target="valueBallEffectRunning" value="false" />
+                </Function>
+                <Function action="onDrawStart">
+                    <CallMethod model="ball" method="setRotationX" args="valueBallRotationX+[cCRotationX]" />
+                    <CallMethod model="ball" method="setRotationY" args="valueBallRotationY" />
+                    <Method name="cCRotationX" model="cCameraRotationX" method="getValue" />
+
+                    <IF judge="valueBallDragingIcon" />
+                        <Var name="ballDragOffsetX" type="float" value="0" />
+                        <Var name="ballDragOffsetY" type="float" value="0" />
+                        <Var name="ballRotationOffsetX" type="float" value="0" />
+                        <Var name="ballRotationOffsetY" type="float" value="0" />
+                        <Command target="ballDragOffsetX" value="[dragIconX]-[iconStartX]"/>
+                        <Command target="ballDragOffsetY" value="[dragIconY]-[iconStartY]"/>
+                        <Command target="ballRotationOffsetX" value="ballDragOffsetX/[canvasWidth]"/>
+                        <Command target="ballRotationOffsetY" value="ballDragOffsetY/[canvasHeight]"/>
+                        <Command target="valueBallRotationX" value="valueBallSourceRotationX+ballRotationOffsetY*360"/>
+                        <Command target="valueBallRotationY" value="valueBallSourceRotationY+ballRotationOffsetX*360"/>
+                        <Method name="dragIconX" model="ThemeVariable" method="getDragIconX" />
+                        <Method name="dragIconY" model="ThemeVariable" method="getDragIconY" />
+                        <Method name="iconStartX" model="ThemeVariable" method="getDragIconStartX" />
+                        <Method name="iconStartY" model="ThemeVariable" method="getDragIconStartY" />
+                        <Method name="canvasWidth" model="ThemeVariable" method="getCanvasWidth" />
+                        <Method name="canvasHeight" model="ThemeVariable" method="getCanvasHeight" />
+
+                    <ELSEIF judge="valueBallEffectRunning" />
+                        <Var name="offsetX" type="float" value="0" />
+                        <Command target="offsetX" value="[rWallpaperOffset]-valueBallStartWallpaperOffset" />
+                        <Command target="valueBallRotationY" value="valueBallSourceRotationY+offsetX*360" />
+                        <Method name="rWallpaperOffset" model="elementWallpaper" method="getWallpaperPrecent" />
+
+                    <ELSE/>
+                        <Command target="valueBallRotationY" value="valueBallRotationY+0.3" />
+                        <Command target="valueBallRotationX" value="valueBallRotationX+(0-valueBallRotationX)*0.2" />
+                    <ENDIF/>
+                </Function>
+
+                <Function action="onDraw">
+                    <CallMethod model="ball" method="setRenderFaceType" args="1" />
+                    <CallMethod model="ball" method="setResourceId" args="1" />
+                    <CallMethod model="ball" method="draw" args="onDraw_matrix" argsType="object"/>
+                    <CallMethod model="ball" method="setRenderFaceType" args="0" />
+                    <CallMethod model="ball" method="setResourceId" args="0" />
+                    <CallMethod model="ball" method="draw" args="onDraw_matrix" argsType="object"/>
+                </Function>
+            </Script>
+        </Model>
+        <Model name="ballLight" modelType="OBJ" modelfile="model_light_ray" texture="light_ray_texture">
+            <Script>
+                <GlobalVar name="valueLightBallDragingIcon" type="boolean" value="false" />
+                <GlobalVar name="valueLightBallRotationX" type="float" value="0" />
+                <GlobalVar name="valueLightBallRotationY" type="float" value="0" />
+                <GlobalVar name="valueLightBallSourceRotationX" type="float" value="0" />
+                <GlobalVar name="valueLightBallSourceRotationY" type="float" value="0" />
+                <Function action="init">
+                    <CallMethod model="ballLight" method="setScale" args="3.5" />
+                    <CallMethod model="ballLight" method="alpha" args="0" />
+                </Function>
+                <Function action="onDrawStart">
+                    <CallMethod model="ballLight" method="setRotationX" args="valueLightBallRotationX+[cCRotationX]" />
+                    <CallMethod model="ballLight" method="setRotationY" args="valueLightBallRotationY" />
+                    <Method name="cCRotationX" model="cCameraRotationX" method="getValue" />
+                    <IF judge="valueLightBallDragingIcon" />
+                        <Var name="dragOffsetX" type="float" value="0" />
+                        <Var name="dragOffsetY" type="float" value="0" />
+                        <Var name="rotationOffsetX" type="float" value="0" />
+                        <Var name="rotationOffsetY" type="float" value="0" />
+                        <Command target="dragOffsetX" value="[dragIconX]-[iconStartX]"/>
+                        <Command target="dragOffsetY" value="[dragIconY]-[iconStartY]"/>
+                        <Command target="rotationOffsetX" value="dragOffsetX/[canvasWidth]"/>
+                        <Command target="rotationOffsetY" value="dragOffsetY/[canvasHeight]"/>
+                        <Command target="valueLightBallRotationX" value="valueLightBallSourceRotationX+rotationOffsetY*360"/>
+                        <Command target="valueLightBallRotationY" value="valueLightBallSourceRotationY+rotationOffsetX*360"/>
+                        <Method name="dragIconX" model="ThemeVariable" method="getDragIconX" />
+                        <Method name="dragIconY" model="ThemeVariable" method="getDragIconY" />
+                        <Method name="iconStartX" model="ThemeVariable" method="getDragIconStartX" />
+                        <Method name="iconStartY" model="ThemeVariable" method="getDragIconStartY" />
+                        <Method name="canvasWidth" model="ThemeVariable" method="getCanvasWidth" />
+                        <Method name="canvasHeight" model="ThemeVariable" method="getCanvasHeight" />
+                    <ENDIF/>
+                </Function>
+                <Function action="onIconStartDrag">
+                    <Command target="valueLightBallDragingIcon" value="true" />
+                    <Command target="valueLightBallSourceRotationX" value="valueLightBallRotationX" />
+                    <Command target="valueLightBallSourceRotationY" value="valueLightBallRotationY" />
+                </Function>
+                <Function action="onIconEndDrag">
+                    <Command target="valueLightBallDragingIcon" value="false" />
+                </Function>
+            </Script>
+        </Model>
+        <LightTail name="tail1" texture="light_tail_texture">
+            <Script>
+                <Function action="init">
+                    <CallMethod model="tail1" method="radius" args="[radius_xxhdpi]"/>
+                    <Method name="radius_xxhdpi" model="ThemeVariable" method="xxhdpi" args="460"/>
+                    <CallMethod model="tail1" method="speedX" args="4.8"/>
+                    <CallMethod model="tail1" method="speedZ" args="0.8"/>
+                </Function>
+            </Script>
+        </LightTail>
+        <LightTail name="tail2" texture="light_tail_texture">
+            <Script>
+                <Function action="init">
+                    <CallMethod model="tail2" method="radius" args="[radius_xxhdpi]"/>
+                    <Method name="radius_xxhdpi" model="ThemeVariable" method="xxhdpi" args="460"/>
+                    <CallMethod model="tail2" method="speedX" args="3.2"/>
+                    <CallMethod model="tail2" method="speedZ" args="0.53"/>
+                </Function>
+            </Script>
+        </LightTail>
+
+        <ValueInterpolator name="cCameraRotationX" speed="0.175" />
+        <Script>
+            <GlobalVar name="globalBallDragingIcon" type="boolean" value="false" />
+            <GlobalVar name="valueGlobalTweenLightModeFrame" type="int" value="0" />
+            <GlobalVar name="STARTANGLE" type="float" value="0" />
+            <GlobalVar name="TOTALANGLE" type="float" value="0" />
+            <Function action="init">
+                <Command target="STARTANGLE" value="[PI]"/>
+                <Method name="PI" model="Math" method="getPI" />
+                <Command target="TOTALANGLE" value="(STARTANGLE/2)*3"/>
+            </Function>
+            <Function action="onIconStartDrag">
+                <Command target="globalBallDragingIcon" value="true" />
+                <Command target="valueGlobalTweenLightModeFrame" value="0" />
+            </Function>
+            <Function action="onIconEndDrag">
+                <Command target="globalBallDragingIcon" value="false" />
+            </Function>
+            <Function action="onSensorChanged">
+                <Var name="sensorY" type="float" value="0"/>
+                <Var name="sensor_min" type="float" value="0"/>
+                <Var name="sensor_max" type="float" value="9"/>
+                <IF judge="sensor_min>onSensorChanged_sensorY"/>
+                    <Command target="sensorY" value="0"/>
+                <ELSE/>
+                    <Command target="sensorY" value="onSensorChanged_sensorY"/>
+                <ENDIF/>
+                <IF judge="sensor_min>onSensorChanged_sensorZ"/>
+                    <IF judge="sensor_max>sensorY"/>
+                        <Command target="sensorY" value="sensor_max"/>
+                    <ENDIF/>
+                <ENDIF/>
+                <Var name="rotationX" type="float" value="0"/>
+                <IF judge="onSensorChanged_sensorZ>sensor_min"/>
+                    <Command target="rotationX" value="90*(9.78-sensorY)/10"/>
+                <ELSE/>
+                    <Command target="rotationX" value="90*(sensorY-9.78)/10"/>
+                <ENDIF/>
+                <CallMethod model="cCameraRotationX" method="setTargetValue" args="rotationX"/>
+            </Function>
+            <Function action="drawCore">
+                <Var name="globalScale" type="float" value="0"/>
+                <Command target="globalScale" value="drawCore_width/1032" />
+                <CallMethod model="cCameraRotationX" method="step"/>
+                <CallMethod model="ball" method="setScaleUnit" args="globalScale"/>
+                <CallMethod model="ballLight" method="setScaleUnit" args="globalScale"/>
+                <IF judge="globalBallDragingIcon" />
+                    <Var name="animationPrecent" type="float" value="0"/>
+                    <Var name="maxFrame" type="int" value="40" />
+                    <IF judge="valueGlobalTweenLightModeFrame==maxFrame" />
+                        <Command target="animationPrecent" value="1" />
+                    <ELSE/>
+                        <Var name="sinPrecent" type="float" value="0"/>
+                        <Command target="sinPrecent" value="STARTANGLE+TOTALANGLE*valueGlobalTweenLightModeFrame/40" />
+                        <Command target="animationPrecent" value="[calc]" />
+                        <Method name="calc" model="Math" method="sin" args="sinPrecent" />
+                        <Command target="valueGlobalTweenLightModeFrame" value="valueGlobalTweenLightModeFrame+1" />
+                    <ENDIF/>
+                    <Var name="scale" type="float" value="0" />
+                    <Command target="scale" value="(1+animationPrecent*0.3)" />
+                    <CallMethod model="ball" method="setScaleAll" args="scale,scale,scale"/>
+                    <CallMethod model="ballLight" method="setScaleAll" args="scale,scale,scale"/>
+                    <CallMethod model="ballLight" method="setAlpha" args="255*animationPrecent"/>
+                <ELSE/>
+                    <Var name="currentScale" type="float" value="0"/>
+                    <Command target="currentScale" value="[ballScale]+(1-[ballScale])*0.2" />
+                    <Method name="ballScale" model="ball" method="getScaleX"/>
+                    <Var name="tempScale" type="float" value="0" />
+                    <Var name="absScale" type="float" value="0" />
+                    <Var name="minScale" type="float" value="0.005" />
+                    <Command target="tempScale" value="1-currentScale" />
+                    <Command target="absScale" value="[calcAbsScale]" />
+                    <Method name="calcAbsScale" model="Math" method="abs" args="tempScale" />
+                    <IF judge="minScale>absScale" />
+                        <Command target="currentScale" value="1"/>
+                    <ENDIF/>
+                    <CallMethod model="ball" method="setScaleAll" args="currentScale,currentScale,currentScale"/>
+                    <CallMethod model="ballLight" method="setScaleAll" args="currentScale,currentScale,currentScale"/>
+                    <Var name="currentAlpha" type="float" value="0"/>
+                    <Command target="currentAlpha" value="[ballLightAlpha]+(0-[ballLightAlpha])*0.2" />
+                    <Method name="ballLightAlpha" model="ballLight" method="getAlpha"/>
+                    <Var name="tempScale" type="float" value="0" />
+                    <Var name="absScale" type="float" value="0" />
+                    <Command target="tempAlpha" value="0-currentAlpha" />
+                    <Command target="absAlpha" value="[calcAbsAlpha]" />
+                    <Method name="calcAbsAlpha" model="Math" method="abs" args="tempAlpha" />
+                    <Var name="minAlpha" type="float" value="0.5" />
+                    <IF judge="absAlpha>minAlpha" />
+                        <Command target="currentAlpha" value="0"/>
+                    <ENDIF/>
+                    <CallMethod model="ballLight" method="setAlpha" args="currentAlpha" />
+                <ENDIF/>
+                <Var name="alpha" type="float" value="0"/>
+                <Command target="alpha" value="drawCore_CoreCurrentAlpha*100"/>
+                <CallMethod model="tail1" method="setRenderFaceType" args="1"/>
+                <CallMethod model="tail1" method="setAlpha" args="alpha"/>
+                <CallMethod model="tail1" method="dispatchDraw" args="drawCore_mMatrix" argsType="object"/>
+                <CallMethod model="tail2" method="setRenderFaceType" args="1"/>
+                <CallMethod model="tail2" method="setAlpha" args="alpha"/>
+                <CallMethod model="tail2" method="dispatchDraw" args="drawCore_mMatrix" argsType="object"/>
+                <CallMethod model="ball" method="dispatchDraw" args="drawCore_mMatrix" argsType="object"/>
+                <CallMethod model="ball" method="setAlpha" args="255*drawCore_CoreCurrentAlpha"/>
+                <CallMethod model="ballLight" method="dispatchDraw" args="drawCore_mMatrix" argsType="object"/>
+                <Command target="alpha" value="drawCore_CoreCurrentAlpha*255"/>
+                <CallMethod model="tail1" method="setRenderFaceType" args="0"/>
+                <CallMethod model="tail1" method="setAlpha" args="alpha"/>
+                <CallMethod model="tail1" method="dispatchDraw" args="drawCore_mMatrix" argsType="object"/>
+                <CallMethod model="tail1" method="step"/>
+                <CallMethod model="tail2" method="setRenderFaceType" args="0"/>
+                <CallMethod model="tail2" method="setAlpha" args="alpha"/>
+                <CallMethod model="tail2" method="dispatchDraw" args="drawCore_mMatrix" argsType="object"/>
+                <CallMethod model="tail2" method="step"/>
+            </Function>
+        </Script>
+	</ElementEffectCore>
+</Theme>

@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<themeConfigs xmlns:livelauncher="http://schemas.android.com/apk/res-auto/" >
+
+    <model
+        livelauncher:config_drawable="wallpaper/wallpaper_background.jpg"
+        livelauncher:config_name="wallpaper" />
+    <model
+        livelauncher:config_drawable="icons/icon_folder.png"
+        livelauncher:config_name="folder" />
+    <model
+        livelauncher:config_drawable="icons/icon_shade.png"
+        livelauncher:config_name="iconhighlight" />
+    <model livelauncher:config_name="iconbg_list" >
+        <icon
+            livelauncher:config_drawable="icons/icon_backgrand_1.png"
+            livelauncher:config_name="iconbg" />
+        <icon
+            livelauncher:config_drawable="icons/icon_backgrand_2.png"
+            livelauncher:config_name="iconbg1" />
+        <icon
+            livelauncher:config_drawable="icons/icon_backgrand_3.png"
+            livelauncher:config_name="iconbg2" />
+        <icon
+            livelauncher:config_drawable="icons/icon_backgrand_4.png"
+            livelauncher:config_name="iconbg3" />
+        <icon
+            livelauncher:config_drawable="icons/icon_backgrand_5.png"
+            livelauncher:config_name="iconbg4" />
+    </model>
+    <model
+        livelauncher:config_drawable="icons/mask_backgrand.png"
+        livelauncher:config_name="iconmask" />
+    <model
+        livelauncher:config_drawable="icons/mask_background_white.png"
+        livelauncher:config_name="clean_bg" />
+    <model
+        livelauncher:config_drawable="icons/change_wallpaper_arrow.png"
+        livelauncher:config_name="changewp_arrow" />
+    <model
+        livelauncher:config_drawable="icons/change_wallpaper_bg.png"
+        livelauncher:config_name="changewp_bg" />
+    <model
+        livelauncher:config_drawable="icons/change_wallpaper_color.png"
+        livelauncher:config_name="changewp_color" />
+    <!-- 控制文件夹ICON间距，launcher支持，打包平台目前不支持配置 -->
+    <!--model
+        livelauncher:config_name="folder_middle"
+        livelauncher:config_value="3" />
+    <model
+        livelauncher:config_name="folder_padding"
+        livelauncher:config_value="8" /-->
+    <model
+        livelauncher:config_name="icon_crop_padding"
+        livelauncher:config_value="false" />
+    <!--     single bg 为只有背板和蒙版时改为true，launcehr中使用程序自带图标也会被处理 -->
+    <model
+        livelauncher:config_name="single_bg"
+        livelauncher:config_value="false" />
+    <!-- single_wallpaper:壁纸是强制单屏 -->
+    <model
+        livelauncher:config_name="single_wallpaper"
+        livelauncher:config_value="true" />
+    <!--     folder_bg 为 打开文件夹后显示背景 -->
+    <model
+        livelauncher:config_name="folder_bg"
+        livelauncher:config_drawable="wallpaper/folder_bg.jpg" />
+    <model livelauncher:config_name="weather" >
+        <icon
+            livelauncher:config_drawable="weather/weather_icon_sunny.png"
+            livelauncher:config_name="qing_upgrade" />
+        <icon
+            livelauncher:config_drawable="weather/weather_icon_cloudless.png"
+            livelauncher:config_name="qing_night_upgrade" />
+        <icon
+            livelauncher:config_drawable="weather/weather_icon_cloudy.png"
+            livelauncher:config_name="duoyun_upgrade" />
+        <icon
+            livelauncher:config_drawable="weather/weather_icon_cloudy_night.png"
+            livelauncher:config_name="duoyun_night_upgrade" />
+        <icon
+            livelauncher:config_drawable="weather/weather_icon_rain.png"
+            livelauncher:config_name="yu_upgrade" />
+        <icon
+            livelauncher:config_drawable="weather/weather_icon_thundershower.png"
+            livelauncher:config_name="leiyu_upgrade" />
+        <icon
+            livelauncher:config_drawable="weather/weather_icon_overcast.png"
+            livelauncher:config_name="yin_upgrade" />
+        <icon
+            livelauncher:config_drawable="weather/weather_icon_fog.png"
+            livelauncher:config_name="wu_upgrade" />
+        <icon
+            livelauncher:config_drawable="weather/weather_icon_foggy_night.png"
+            livelauncher:config_name="wu_night_upgrade" />
+        <icon
+            livelauncher:config_drawable="weather/weather_icon_sand_storm.png"
+            livelauncher:config_name="feng_upgrade" />
+        <icon
+            livelauncher:config_drawable="weather/weather_icon_tornado.png"
+            livelauncher:config_name="jufeng" />
+        <icon
+            livelauncher:config_drawable="weather/weather_icon_snow.png"
+            livelauncher:config_name="xue_upgrade" />
+        <icon
+            livelauncher:config_drawable="weather/weather_icon_sleet.png"
+            livelauncher:config_name="yujiaxue_upgrade" />
+        <icon
+            livelauncher:config_drawable="weather/weather_bg.9.png"
+            livelauncher:config_name="background" />
+    </model>
+    <model livelauncher:config_name="search" >
+        <icon
+            livelauncher:config_drawable="search/search_background.9.png"
+            livelauncher:config_name="background" />
+        <icon
+            livelauncher:config_drawable="search/search_icon.png"
+            livelauncher:config_name="button" />
+        <icon
+            livelauncher:config_drawable="balloon/ad_gl_handle_bg.png"
+            livelauncher:config_name="balloon_background" />
+    </model>
+    <model livelauncher:config_name="menu" >
+        <icon
+            livelauncher:config_drawable="menu/menu_set_wallpaper.png"
+            livelauncher:config_name="set_wallpaper" />
+        <icon
+            livelauncher:config_drawable="menu/menu_add_widget.png"
+            livelauncher:config_name="add_widget" />
+        <icon
+            livelauncher:config_drawable="menu/menu_new_folder.png"
+            livelauncher:config_name="new_folder" />
+        <icon
+            livelauncher:config_drawable="menu/menu_score.png"
+            livelauncher:config_name="score" />
+        <icon
+            livelauncher:config_drawable="menu/menu_sys_setting.png"
+            livelauncher:config_name="sys_setting" />
+        <icon
+            livelauncher:config_drawable="menu/menu_desktop_setting.png"
+            livelauncher:config_name="desktop_setting" />
+        <icon
+            livelauncher:config_drawable="menu/menu_feedback.png"
+            livelauncher:config_name="feedback" />
+    </model>
+    <model livelauncher:config_name="pageindicator" >
+        <icon
+            livelauncher:config_drawable="pageindicator/ic_pageindicator_default.png"
+            livelauncher:config_name="default" />
+        <icon
+            livelauncher:config_drawable="pageindicator/ic_pageindicator_default_inverse.png"
+            livelauncher:config_name="default_inverse" />
+        <icon
+            livelauncher:config_drawable="pageindicator/ic_pageindicator_current.png"
+            livelauncher:config_name="current" />
+        <icon
+            livelauncher:config_drawable="pageindicator/ic_pageindicator_current_inverse.png"
+            livelauncher:config_name="current_inverse" />
+        <icon
+            livelauncher:config_drawable="pageindicator/ic_pageindicator_add.png"
+            livelauncher:config_name="add" />
+        <icon
+            livelauncher:config_drawable="pageindicator/ic_pageindicator_add_black.png"
+            livelauncher:config_name="add_black" />
+        <icon
+            livelauncher:config_drawable="pageindicator/ic_pageindicator_add_inverse.png"
+            livelauncher:config_name="add_inverse" />
+        <icon
+            livelauncher:config_drawable="pageindicator/ic_pageindicator_add_white.png"
+            livelauncher:config_name="add_white" />
+        <icon
+            livelauncher:config_drawable="pageindicator/page_indicator_current.png"
+            livelauncher:config_name="page_current" />
+    </model>
+    <model livelauncher:config_name="shortcutbar" >
+        <icon
+            livelauncher:config_drawable="shortcutbar/shortcutbar_all.png"
+            livelauncher:config_name="all" />
+        <icon
+            livelauncher:config_drawable="shortcutbar/shortcutbar_torch.png"
+            livelauncher:config_name="torch" />
+        <icon
+            livelauncher:config_drawable="shortcutbar/shortcutbar_data.png"
+            livelauncher:config_name="data" />
+        <icon
+            livelauncher:config_drawable="shortcutbar/shortcutbar_wifi.png"
+            livelauncher:config_name="wifi" />
+        <icon
+            livelauncher:config_drawable="shortcutbar/shortcutbar_more.png"
+            livelauncher:config_name="more" />
+    </model>
+    <!-- config_value 定義的是撥放序列，對應到底下列表的音檔，舉例來說 config_value 裡頭的 "3,3,3,3,3,3,3,..." 會連續撥放七次在列表中的第三個音檔("audio/#3.mp3")-->
+    <!-- config_value 撥放序列跟 config_audio & config_name 裡頭的數字或名字沒關係，單純只對照 audio tag 宣告的順序-->
+    <model livelauncher:config_name="sounds" livelauncher:config_value="3,3,3,3,3,3,3,5,1,2,3,4,4,4,4,4,3,3,3,2,2,1,2,5,3,3,3,3,3,3,3,5,1,2,3,4,4,4,4,4,3,3,5,5,4,2,1">
+        <audio
+            livelauncher:config_audio="audio/#1.mp3"
+            livelauncher:config_name="#1" />
+        <audio
+            livelauncher:config_audio="audio/#2.mp3"
+            livelauncher:config_name="#2" />
+        <audio
+            livelauncher:config_audio="audio/#3.mp3"
+            livelauncher:config_name="#3" />
+        <audio
+            livelauncher:config_audio="audio/#4.mp3"
+            livelauncher:config_name="#4" />
+        <audio
+            livelauncher:config_audio="audio/#5.mp3"
+            livelauncher:config_name="#5" />
+    </model>
+    <!--<model livelauncher:config_name="overlay_color_new"-->
+        <!--livelauncher:config_value="#19AFCA"/>-->
+    <model livelauncher:config_name="texture_chartlet_new"
+        livelauncher:config_drawable="icons/icon_texture_chartlet.png"/>
+    <model livelauncher:config_name="alert_widget_weather" >
+        <icon
+            livelauncher:config_drawable="weather/alert_clock_widget_water_0.png"
+            livelauncher:config_name="alert_clock_widget_water_0" />
+        <icon
+            livelauncher:config_drawable="weather/alert_clock_widget_water_1.png"
+            livelauncher:config_name="alert_clock_widget_water_1" />
+        <icon
+            livelauncher:config_drawable="weather/alert_clock_widget_water_2.png"
+            livelauncher:config_name="alert_clock_widget_water_2" />
+        <icon
+            livelauncher:config_drawable="weather/alert_clock_widget_lighthouse_day.png"
+            livelauncher:config_name="alert_clock_widget_lighthouse_day" />
+        <icon
+            livelauncher:config_drawable="weather/alert_clock_widget_lighthouse_night.png"
+            livelauncher:config_name="alert_clock_widget_lighthouse_night" />
+        <icon
+            livelauncher:config_drawable="weather/alert_clock_widget_ship.png"
+            livelauncher:config_name="alert_clock_widget_ship" />
+    </model>
+
+    <!-- DAE -->
+    <model livelauncher:config_name="dae_koi"
+           livelauncher:config_value="3d_model/koi_fish_model.dae"/>
+
+    <!-- Texture -->
+    <model livelauncher:config_name="3d_model">
+
+        <icon livelauncher:config_name="bg_1_texture"
+              livelauncher:config_drawable="3d_model/texture/koi_background_texture.jpg"></icon>
+
+        <icon livelauncher:config_name="koi_body_texture_1"
+              livelauncher:config_drawable="3d_model/texture/koi_fish_texture_1.png"></icon>
+
+        <icon livelauncher:config_name="koi_body_texture_2"
+              livelauncher:config_drawable="3d_model/texture/koi_fish_texture_2.png"></icon>
+
+        <icon livelauncher:config_name="koi_body_texture_3"
+              livelauncher:config_drawable="3d_model/texture/koi_fish_texture_3.png"></icon>
+
+    </model>
+
+</themeConfigs>

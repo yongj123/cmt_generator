@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Theme effect="sphere" version="1">
+    <Wallpaper name="elementWallpaper">
+
+        <Model name="galaxy" modelType="OBJ" modelfile="bg" texture="galaxy_texture" facetype="1" depthTestEnabled="true">
+            <Script>
+                <Function action="onDrawStart">
+                    <CallMethod model="vICameraRotationX" method="step"/>
+                    <CallMethod model="galaxy" method="setRotationX" args="[cRotationX]"/>
+                    <Method name="cRotationX" model="vICameraRotationX" method="getValue" />
+
+                </Function>
+            </Script>
+        </Model>
+
+        <Group name="sunGroup">
+            <Model name="sun" modelType="OBJ" modelfile="star" texture="sun_texture" depthTestEnabled="true" scale="3" >
+                <Script>
+
+                    <Function action="onDrawStart">
+                        <!-- 公转 -->
+                        <CallMethod model="galaxy" method="setRotationY" args="solarAngleGalaxy" />
+                        <CallMethod model="sunGroup" method="setRotationY" args="solarAngleSun" />
+                        <CallMethod model="mercuryGroup" method="setRotationY" args="solarAngleMercury" />
+                        <CallMethod model="venusGroup" method="setRotationY" args="solarAngleVenus" />
+                        <CallMethod model="earthGroup" method="setRotationY" args="solarAngleEarth" />
+                        <CallMethod model="marsGroup" method="setRotationY" args="solarAngleMars" />
+                        <CallMethod model="jupiterGroup" method="setRotationY" args="solarAngleJupiter" />
+                        <CallMethod model="saturnGroup" method="setRotationY" args="solarAngleSaturn" />
+                        <CallMethod model="uranusGroup" method="setRotationY" args="solarAngleUranus" />
+                        <CallMethod model="neptuneGroup" method="setRotationY" args="solarAngleNeptune" />
+                        <CallMethod model="plutoGroup" method="setRotationY" args="solarAnglePluto" />
+                        
+                        <!-- 自转 -->
+                        <CallMethod model="sun" method="setRotationY" args="selfAngleSun" />
+                        <CallMethod model="mercury" method="setRotationY" args="selfAngleMercury" />
+                        <CallMethod model="venus" method="setRotationY" args="selfAngleVenus" />
+                        <CallMethod model="earth" method="setRotationY" args="selfAngleEarth" />
+                        <CallMethod model="mars" method="setRotationY" args="selfAngleMars" />
+                        <CallMethod model="jupiter" method="setRotationY" args="selfAngleJupiter" />
+                        <CallMethod model="saturn" method="setRotationY" args="selfAngleSaturn" />
+                        <CallMethod model="uranus" method="setRotationY" args="selfAngleUranus" />
+                        <CallMethod model="neptune" method="setRotationY" args="selfAngleNeptune" />
+                        <CallMethod model="pluto" method="setRotationY" args="selfAnglePluto" />   
+                        <Command target="selfAngleSun" value="selfAngleSun-0.6"/>
+                        <Command target="selfAngleMercury" value="selfAngleMercury+1.2"/>
+                        <Command target="selfAngleVenus" value="selfAngleVenus+1.4"/>
+                        <Command target="selfAngleEarth" value="selfAngleEarth+1.6"/>
+                        <Command target="selfAngleMars" value="selfAngleMars+1.8"/>
+                        <Command target="selfAngleJupiter" value="selfAngleJupiter+1.6"/>
+                        <Command target="selfAngleSaturn" value="selfAngleSaturn+1.4"/>
+                        <Command target="selfAngleUranus" value="selfAngleUranus+1.2"/>
+                        <Command target="selfAngleNeptune" value="selfAngleNeptune+1"/>
+                        <Command target="selfAnglePluto" value="selfAnglePluto+0.8"/>                    
+
+                        <!-- 重力感应 -->
+                        <CallMethod model="vICameraRotationX" method="step"/>
+                        <CallMethod model="galaxy" method="setRotationX" args="[cRotationX]"/>
+                        <CallMethod model="sunGroup" method="setRotationX" args="[cRotationX]"/>
+                        <CallMethod model="mercuryGroup" method="setRotationX" args="[cRotationX]"/>
+                        <CallMethod model="venusGroup" method="setRotationX" args="[cRotationX]"/>
+                        <CallMethod model="earthGroup" method="setRotationX" args="[cRotationX]"/>
+                        <CallMethod model="marsGroup" method="setRotationX" args="[cRotationX]"/>
+                        <CallMethod model="jupiterGroup" method="setRotationX" args="[cRotationX]"/>
+                        <CallMethod model="saturnGroup" method="setRotationX" args="[cRotationX]"/>
+                        <CallMethod model="uranusGroup" method="setRotationX" args="[cRotationX]"/>
+                        <CallMethod model="neptuneGroup" method="setRotationX" args="[cRotationX]"/>
+                        <CallMethod model="plutoGroup" method="setRotationX" args="[cRotationX]"/>
+                        <!-- 对拖动图标的情况进行分析 -->
+                        <IF judge="mainDragingIcon" />
+                            <Var name="dragRotationx" type="float" value="0" />
+                            <Command target="dragRotationx" value="90"/>
+                            <CallMethod model="vICameraRotationX" method="setTargetValue" args="dragRotationx"/>
+                            <Method name="cRotationX" model="vICameraRotationX" method="getValue" />
+                        <ELSE/>
+                            <CallMethod model="vICameraRotationX" method="setTargetValue" args="rotationX"/>
+                            <Method name="cRotationX" model="vICameraRotationX" method="getValue" />
+                        <ENDIF/>
+                
+                        <!-- 设置滑屏角度 -->
+                        <IF judge="mainEffectRunning" />
+                            <Var name="offsetX" type="float" value="0" />
+                            <Command target="offsetX" value="[rWallpaperOffset]-mainStartWallpaperOffset" />
+                            <Command target="solarAngleGalaxy" value="solarAngleGalaxy-offsetX*20" />
+                            <Command target="solarAngleSun" value="solarAngleSun-offsetX*20" />
+                            <Command target="solarAngleMercury" value="solarAngleMercury-offsetX*20" />
+                            <Command target="solarAngleVenus" value="solarAngleVenus-offsetX*20" />
+                            <Command target="solarAngleEarth" value="solarAngleEarth-offsetX*20" />
+                            <Command target="solarAngleMars" value="solarAngleMars-offsetX*20" />
+                            <Command target="solarAngleJupiter" value="solarAngleJupiter-offsetX*20" />
+                            <Command target="solarAngleSaturn" value="solarAngleSaturn-offsetX*20" />
+                            <Command target="solarAngleUranus" value="solarAngleUranus-offsetX*20" />
+                            <Command target="solarAngleNeptune" value="solarAngleNeptune-offsetX*20" />
+                            <Command target="solarAnglePluto" value="solarAnglePluto-offsetX*20" />
+                            <Method name="rWallpaperOffset" model="elementWallpaper" method="getWallpaperPrecent" />
+                        
+                        <!-- 设置公转角度 -->
+                        <ELSE/>
+                            <Command target="solarAngleGalaxy" value="solarAngleGalaxy+0.05"/>
+                            <Command target="solarAngleSun" value="solarAngleSun+0.025"/>
+                            <Command target="solarAngleMercury" value="solarAngleMercury+1"/>
+                            <Command target="solarAngleVenus" value="solarAngleVenus+0.5"/>
+                            <Command target="solarAngleEarth" value="solarAngleEarth+0.25"/>
+                            <Command target="solarAngleMars" value="solarAngleMars+0.175"/>
+                            <Command target="solarAngleJupiter" value="solarAngleJupiter+0.125"/>
+                            <Command target="solarAngleSaturn" value="solarAngleSaturn+0.1"/>
+                            <Command target="solarAngleUranus" value="solarAngleUranus+0.075"/>
+                            <Command target="solarAngleNeptune" value="solarAngleNeptune+0.05"/>
+                            <Command target="solarAnglePluto" value="solarAnglePluto+0.025"/>
+                        <ENDIF/>
+
+                        <!-- 拖动图标效果 -->
+                        <CallMethod model="galaxy" method="setScale" args="solarScale" />
+                        <CallMethod model="sunGroup" method="setScale" args="solarScale" />
+                        <CallMethod model="mercuryGroup" method="setScale" args="solarScale" />
+                        <CallMethod model="venusGroup" method="setScale" args="solarScale" />
+                        <CallMethod model="earthGroup" method="setScale" args="solarScale" />
+                        <CallMethod model="marsGroup" method="setScale" args="solarScale" />
+                        <CallMethod model="jupiterGroup" method="setScale" args="solarScale" />
+                        <CallMethod model="saturnGroup" method="setScale" args="solarScale" />
+                        <CallMethod model="uranusGroup" method="setScale" args="solarScale" />
+                        <CallMethod model="neptuneGroup" method="setScale" args="solarScale" />
+                        <CallMethod model="plutoGroup" method="setScale" args="solarScale" />
+                        <IF judge="mainDragingIcon" />
+                            <IF judge="solarScale>scaleMin" />
+                                <Command target="solarScale" value="solarScale-0.1" />
+                            <ENDIF/>
+                        <ELSEIF judge="scaleMax>solarScale"/>
+                            <Command target="solarScale" value="solarScale+0.1" />
+                        <ENDIF/>
+
+                    </Function>
+                </Script>
+            </Model>
+        </Group>
+
+        <Group name="mercuryGroup" >
+            <Model name="mercury" modelType="OBJ" modelfile="planet" x="260" texture="mercury_texture" depthTestEnabled="true" scale="0.85" >
+            </Model>
+            <!-- <Sphere name="mercuryNight" radius="51" columns="20" rows="20" x="260" texture="night_texture" depthTestEnabled="true" >
+            </Sphere> -->
+        </Group>
+
+        <Group name="venusGroup" >
+            <Model name="venus" modelType="OBJ" modelfile="planet" x="460" texture="venus_texture" depthTestEnabled="true" >
+            </Model>
+            <!-- <Sphere name="venusNight" radius="61" columns="20" rows="20" x="460" texture="night_texture" depthTestEnabled="true" >
+            </Sphere> -->
+        </Group>
+
+        <Group name="earthGroup" >
+            <Model name="earth" modelType="OBJ" modelfile="planet" x="700" texture="earth_texture" depthTestEnabled="true" scale="1.35" >
+            </Model>
+            <!-- <Sphere name="earthNight" radius="81" columns="20" rows="20" x="700" texture="night_texture" depthTestEnabled="true" >
+            </Sphere> -->
+        </Group>
+
+        <Group name="marsGroup">
+            <Model name="mars" modelType="OBJ" modelfile="planet" x="950" texture="mars_texture" depthTestEnabled="true" >
+            </Model>
+            <!-- <Sphere name="marsNight" radius="61" columns="20" rows="20" x="950" texture="night_texture" depthTestEnabled="true" >
+            </Sphere> -->
+        </Group>
+
+        <Group name="jupiterGroup">
+            <Model  name="jupiter" modelType="OBJ" modelfile="planet" x="1200" texture="jupiter_texture" depthTestEnabled="true" scale="2" >
+            </Model>
+            <!-- <Sphere name="jupiterNight" radius="122" columns="20" rows="20" x="1200" texture="night_texture" depthTestEnabled="true" >
+            </Sphere> -->
+        </Group>
+
+        <Group name="saturnGroup">
+            <Model  name="saturn" modelType="OBJ" modelfile="planet" x="1500" texture="saturn_texture" depthTestEnabled="true" scale="2.7" >
+            </Model >
+            <!-- <Sphere name="saturnNight" radius="162" columns="20" rows="20" x="1500" texture="night_texture" depthTestEnabled="true" >
+            </Sphere>
+            <Model name="ring" modelType="OBJ" modelfile="model_ring" x="1500" y="0" z="0" texture="ring_texture" scale="260" rotationx="-10" depthTestEnabled="true">
+            </Model> -->
+        </Group>
+
+        <Group name="uranusGroup">
+            <Model name="uranus" modelType="OBJ" modelfile="planet" x="1700" texture="uranus_texture" depthTestEnabled="true" >
+            </Model>
+            <!-- <Sphere name="uranusNight" radius="61" columns="20" rows="20" x="1700" texture="night_texture" depthTestEnabled="true" >
+            </Sphere> -->
+        </Group>
+
+        <Group name="neptuneGroup">
+            <Model  name="neptune" modelType="OBJ" modelfile="planet" x="1850" texture="neptune_texture" depthTestEnabled="true" scale="1.35" >
+            </Model >
+            <!-- <Sphere name="neptuneNight" radius="81" columns="20" rows="20" x="1850" texture="night_texture" depthTestEnabled="true" >
+            </Sphere> -->
+        </Group>
+
+        <Group name="plutoGroup">
+            <Model name="pluto" modelType="OBJ" modelfile="planet" x="2000" texture="pluto_texture" depthTestEnabled="true" >
+            </Model>
+            <!-- <Sphere name="plutoNight" radius="61" columns="20" rows="20" x="2000" texture="night_texture" depthTestEnabled="true" >
+            </Sphere> -->
+        </Group>
+
+        <Script>
+
+            <!-- 摄像机变量 -->
+            <ValueInterpolator name="cCameraRotationX" speed="0.06" />
+            <ValueInterpolator name="vICameraRotationX" speed="0.06" />
+            
+            <!-- 公转变量 -->
+            <GlobalVar name="solarAngleGalaxy" type="float" value="0"/>
+            <GlobalVar name="solarAngleSun" type="float" value="0"/>
+            <GlobalVar name="solarAngleMercury" type="float" value="0"/>
+            <GlobalVar name="solarAngleVenus" type="float" value="180"/>
+            <GlobalVar name="solarAngleEarth" type="float" value="40"/>
+            <GlobalVar name="solarAngleMars" type="float" value="220"/>
+            <GlobalVar name="solarAngleJupiter" type="float" value="80"/>
+            <GlobalVar name="solarAngleSaturn" type="float" value="260"/>
+            <GlobalVar name="solarAngleUranus" type="float" value="120"/>
+            <GlobalVar name="solarAngleNeptune" type="float" value="300"/>
+            <GlobalVar name="solarAnglePluto" type="float" value="160"/>
+
+            <!-- Y轴深度，用于拖动图标 -->
+            <GlobalVar name="scaleMax" type="float" value="1"/>
+            <GlobalVar name="scaleMin" type="float" value="0.3"/>
+            <GlobalVar name="isFalse" type="boolean" value="false" />
+            <GlobalVar name="solarScale" type="float" value="1" />
+
+
+            <!-- 自转变量 -->
+            <GlobalVar name="selfAngleGalaxy" type="float" value="0"/>
+            <GlobalVar name="selfAngleSun" type="float" value="0"/>
+            <GlobalVar name="selfAngleMercury" type="float" value="0"/>
+            <GlobalVar name="selfAngleVenus" type="float" value="180"/>
+            <GlobalVar name="selfAngleEarth" type="float" value="40"/>
+            <GlobalVar name="selfAngleMars" type="float" value="220"/>
+            <GlobalVar name="selfAngleJupiter" type="float" value="80"/>
+            <GlobalVar name="selfAngleSaturn" type="float" value="260"/>
+            <GlobalVar name="selfAngleUranus" type="float" value="120"/>
+            <GlobalVar name="selfAngleNeptune" type="float" value="300"/>
+            <GlobalVar name="selfAnglePluto" type="float" value="160"/>
+
+            <!-- 手势跟随变量 -->
+            <GlobalVar name="mainRotationX" type="float" value="0" />
+            <GlobalVar name="mainRotationY" type="float" value="0" />
+            <GlobalVar name="mainSourceRotationX" type="float" value="0" />
+            <GlobalVar name="mainSourceRotationY" type="float" value="0" />
+            <GlobalVar name="mainStartWallpaperOffset" type="float" value="0" />
+            <GlobalVar name="mainTweenLightModeFrame" type="int" value="0" />
+            <GlobalVar name="mainDragingIcon" type="boolean" value="false" />
+            <GlobalVar name="mainEffectRunning" type="boolean" value="false" />
+
+            <GlobalVar name="rotationX" type="float" value="0"/>
+
+            <!-- 设置重力传感器 -->
+            <Function action="onSensorChanged">
+                <Var name="sensorY" type="float" value="0"/>
+                <Var name="sensor_min" type="float" value="0"/>
+                <Var name="sensor_max" type="float" value="9"/>
+                <IF judge="sensor_min>onSensorChanged_sensorY"/>
+                    <Command target="sensorY" value="0"/>
+                <ELSE/>
+                    <Command target="sensorY" value="onSensorChanged_sensorY"/>
+                <ENDIF/>
+                <IF judge="sensor_min>onSensorChanged_sensorZ"/>
+                    <IF judge="sensor_max>sensorY"/>
+                        <Command target="sensorY" value="sensor_max"/>
+                    <ENDIF/>
+                <ENDIF/>
+                <IF judge="onSensorChanged_sensorZ>sensor_min"/>
+                    <Command target="rotationX" value="90*(9.78-sensorY)/10"/>
+                <ELSE/>
+                    <Command target="rotationX" value="120*(sensorY-9.78)/10"/>
+                <ENDIF/>
+            </Function>
+
+            <!-- 开始绘制wallpaper -->
+            <Function action="drawWallpaper">
+                <Var name="scaleUnit" type="float" value="0" />
+                <Command target="scaleUnit" value="drawWallpaper_width/1080f"/>
+                <CallMethod model="cCameraRotationX" method="step"/>
+
+                <!-- 初始化 -->
+                <CallMethod model="mercuryGroup" method="setScaleUnit" args="scaleUnit"/>
+                <CallMethod model="venusGroup" method="setScaleUnit" args="scaleUnit"/>
+                <CallMethod model="earthGroup" method="setScaleUnit" args="scaleUnit"/>
+                <CallMethod model="marsGroup" method="setScaleUnit" args="scaleUnit"/>
+                <CallMethod model="jupiterGroup" method="setScaleUnit" args="scaleUnit"/>
+                <CallMethod model="saturnGroup" method="setScaleUnit" args="scaleUnit"/>
+                <CallMethod model="uranusGroup" method="setScaleUnit" args="scaleUnit"/>
+                <CallMethod model="neptuneGroup" method="setScaleUnit" args="scaleUnit"/>
+                <CallMethod model="plutoGroup" method="setScaleUnit" args="scaleUnit"/>
+                <CallMethod model="sunGroup" method="setScaleUnit" args="scaleUnit"/>
+                <CallMethod model="galaxy" method="setScaleUnit" args="scaleUnit"/>
+
+                <CallMethod model="mercuryGroup" method="dispatchDraw"/>
+                <CallMethod model="venusGroup" method="dispatchDraw"/>
+                <CallMethod model="earthGroup" method="dispatchDraw"/>
+                <CallMethod model="marsGroup" method="dispatchDraw"/>
+                <CallMethod model="jupiterGroup" method="dispatchDraw"/>
+                <CallMethod model="saturnGroup" method="dispatchDraw"/>
+                <CallMethod model="uranusGroup" method="dispatchDraw"/>
+                <CallMethod model="neptuneGroup" method="dispatchDraw"/>
+                <CallMethod model="plutoGroup" method="dispatchDraw"/>
+                <CallMethod model="sunGroup" method="dispatchDraw"/>
+                <CallMethod model="galaxy" method="dispatchDraw"/>
+
+                <CallMethod model="mercuryGroup" method="setAlpha" args="255"/>
+                <CallMethod model="venusGroup" method="setAlpha" args="255"/>
+                <CallMethod model="earthGroup" method="setAlpha" args="255"/>
+                <CallMethod model="marsGroup" method="setAlpha" args="255"/>
+                <CallMethod model="jupiterGroup" method="setAlpha" args="255"/>
+                <CallMethod model="saturnGroup" method="setAlpha" args="255"/>
+                <CallMethod model="uranusGroup" method="setAlpha" args="255"/>
+                <CallMethod model="neptuneGroup" method="setAlpha" args="255"/>
+                <CallMethod model="plutoGroup" method="setAlpha" args="255"/>
+                <CallMethod model="sunGroup" method="setAlpha" args="255"/>
+                <CallMethod model="galaxy" method="setAlpha" args="255"/>
+            </Function>
+
+            <!-- 滑屏动效开始 -->
+            <Function action="onDesktopEffectStart">
+                <Command target="mainEffectRunning" value="true" />
+                <Command target="mainStartWallpaperOffset" value="[wallpaperOffset]" />
+                <Command target="mainSourceRotationX" value="mainRotationX" />
+                <Command target="mainSourceRotationY" value="mainRotationY" />
+                <Method name="wallpaperOffset" model="elementWallpaper" method="getWallpaperPrecent" />
+            </Function>
+
+            <!-- 滑屏动效结束 -->
+            <Function action="onDesktopEffectEnd">
+                <Command target="mainEffectRunning" value="false" />
+            </Function>
+
+            <!-- 拖动图标开始 -->
+            <Function action="onIconStartDrag">
+                <Command target="mainDragingIcon" value="true" />
+            </Function>
+
+            <!-- 拖动图标开始结束 -->
+            <Function action="onIconEndDrag">
+                <Command target="mainDragingIcon" value="false" />
+            </Function>
+
+        </Script>
+
+    </Wallpaper>
+
+
+	<ElementEffectCore name="effectcore">
+	</ElementEffectCore>
+</Theme>

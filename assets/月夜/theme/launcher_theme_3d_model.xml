@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Theme effect="sphere" version="1">
+    <Wallpaper name="elementWallpaper">
+        <!--定义手势跟随粒子效果-->
+        <ParticlePoint name="touchfollow" count="5" size="40xxhdpi" texture="particle_blue" duration="500">
+            <Script>
+                <Function action="init">
+                    <Var name="speed" type="float" value="0"/>
+                    <CallMethod target="speed" model="ThemeVariable" method="xxhdpi" args="5" />
+                    <CallMethod model="touchfollow" method="setSpeedParamX" args="0,speed,true" argsType="float,float,boolean" />
+                    <CallMethod model="touchfollow" method="setSpeedParamY" args="0,speed,true" argsType="float,float,boolean" />
+                    <CallMethod model="touchfollow" method="setSpeedParamZ" args="0,speed,true" argsType="float,float,boolean" />
+                </Function>
+            </Script>
+        </ParticlePoint>
+
+        <Particle2D name="particleeffect" texture="particle_blue" type="halo">
+            <Script>
+                <Function action="init">
+                    <CallMethod model="particleeffect" method="setMaxParticles" args="12" argsType="float"/>
+                    <CallMethod model="particleeffect" method="setParticleWidth" args="60" argsType="float"/>
+                    <CallMethod model="particleeffect" method="setParticleWidthVariance" args="0.25" argsType="float"/>
+                
+                    <CallMethod model="particleeffect" method="setParticleLifespan" args="360" argsType="int"/>
+                    <CallMethod model="particleeffect" method="setParticleFadingInAnimationTime" args="30" argsType="int"/>
+                    <CallMethod model="particleeffect" method="setParticleFadingOutAnimationTime" args="300" argsType="int"/>
+                    <CallMethod model="particleeffect" method="setGeneratorPercentagePerFrame" args="0.99" argsType="float"/>
+                    <CallMethod model="particleeffect" method="setParticleFloatingSpeedX" args="0.2" argsType="float"/>
+                    <CallMethod model="particleeffect" method="setParticleStartSpeedYMin" args="0.4" argsType="float"/>
+                    <CallMethod model="particleeffect" method="setParticleStartSpeedYMax" args="0.8" argsType="float"/>
+                </Function>
+            </Script>
+        </Particle2D>
+
+         <ParticlePoint name="mouthparticles" count="10" size="60xxhdpi" texture="particle_white" duration="1000">
+            <Script>
+                <Function action="init">
+                    <Var name="speed" type="float" value="0"/>
+                    <CallMethod target="speed" model="ThemeVariable" method="xxhdpi" args="5" />
+                    <CallMethod model="mouthparticles" method="setSpeedParamX" args="0,speed,true" argsType="float,float,boolean" />
+                    <CallMethod model="mouthparticles" method="setSpeedParamY" args="0,speed,true" argsType="float,float,boolean" />
+                    <CallMethod model="mouthparticles" method="setSpeedParamZ" args="0,speed,true" argsType="float,float,boolean" />
+                </Function>
+            </Script>
+        </ParticlePoint>
+
+        <Sphere name="bgSphere" radius="3000" columns="20" rows="20" texture="wolf_bg_texture" facetype="1" depthTestEnabled="true">
+            <Script>
+                <Function action="onDrawStart">
+                    <CallMethod model="vICameraRotationX" method="step"/>
+                    <CallMethod model="bgSphere" method="setRotationX" args="[cRotationX]"/>
+                    <Method name="cRotationX" model="cCameraRotationX" method="getValue" />
+
+                </Function>
+            </Script>
+        </Sphere>
+
+
+        <Group name="wolfGroup">
+            <Model name="wolf_head" modelType="OBJ" modelfile="model_wolf_head" x="0" y="-400" z="0" texture="wolf_head_texture" scale="1100" rotationx="15" depthTestEnabled="true">
+            </Model>
+
+            <Model name="wolf_mouth" modelType="OBJ" modelfile="model_wolf_mouth" x="0" y="-400" z="0" texture="wolf_mouth_texture" scale="1100" rotationx="15" depthTestEnabled="true">
+            </Model>
+
+            <Model name="wolf_neck" modelType="OBJ" modelfile="model_wolf_neck" x="0" y="-400" z="0" texture="wolf_neck_texture" scale="1100" rotationx="15" depthTestEnabled="true">
+            </Model>
+            
+                <Script>
+
+                    <Function action="onDrawStart">
+
+                        <!-- Head rotation -->
+                        <CallMethod model="wolfGroup" method="setRotationY" args="headRotationY"/>
+                        <CallMethod model="flashEyesGroup" method="setRotationY" args="headRotationY"/>
+
+                        <IF judge="isHeadRotateLeft"/>
+                            <IF judge="headRotationMaxY>headRotationY"/>
+                                <Command target="headRotationY" value="headRotationY+headRotateSpeedY"/>
+                            <ELSE/>
+                                <Command target="isHeadRotateLeft" value="false"/>
+                            <ENDIF/>
+                        <ELSEIF judge="headRotationY>headRotationMinY"/>
+                            <Command target="headRotationY" value="headRotationY-headRotateSpeedY"/>
+                        <ELSE/>
+                            <Command target="isHeadRotateLeft" value="true"/>
+                        <ENDIF/>
+
+                        <!-- Mouth rotation -->
+                        <CallMethod model="wolf_mouth" method="setRotationX" args="mouthRotation"/>
+
+                        <IF judge="isMouthOpen"/>
+                            <IF judge="mouthRotationMax>mouthRotation"/>
+                                <Command target="mouthRotation" value="mouthRotation+mouthRotateSpeed"/>
+                            <ELSE/>
+                                <Command target="isMouthOpen" value="false"/>
+                            <ENDIF/>
+                        <ELSEIF judge="mouthRotation>mouthRotationMin"/>
+                            <Command target="mouthRotation" value="mouthRotation-mouthRotateSpeed"/>
+                        <ELSE/>
+                            <Command target="isMouthOpen" value="true"/>
+                        <ENDIF/>
+
+
+                        <!-- 重力感应 -->
+                        <CallMethod model="cCameraRotationX" method="step"/>
+                        <CallMethod model="bgSphere" method="setRotationX" args="[cRotationX]"/>
+                        <CallMethod model="wolfGroup" method="setRotationX" args="[cRotationX]"/>
+                        <CallMethod model="flashEyesGroup" method="setRotationX" args="[cRotationX]"/>
+                        <CallMethod model="forestEyesGroup" method="setRotationX" args="[cRotationX]"/>
+                        <Method name="cRotationX" model="cCameraRotationX" method="getValue" />  
+
+
+                        <!-- Flash eyes animation, fade in, fade out -->
+                        <!-- Dragging or Swiping -->
+                        <CallMethod model="flashEyesGroup" method="setAlpha" args="wolfEyesAlpha"/>
+
+                        <!-- Fade in whenn swipe -->
+                        <IF judge="mainEffectRunning" />
+                            <IF judge="wolfEyesAlphaMax>wolfEyesAlpha" />
+                                <Command target="wolfEyesAlpha" value="wolfEyesAlpha+wolfEyesAlphaSpeed" />
+                            <ELSE/>
+                                <Command target="isWolfEyesFaedOut" value="true" />
+                            <ENDIF/>
+                        <ENDIF/>
+
+                        <!-- Fade in when drag -->
+                        <IF judge="mainDragingIcon" />
+                            <IF judge="wolfEyesAlphaMax>wolfEyesAlpha" />
+                                <Command target="wolfEyesAlpha" value="wolfEyesAlpha+wolfEyesAlphaSpeed" />
+                            <ELSE/>
+                                <Command target="isWolfEyesFaedOut" value="true" />
+                            <ENDIF/>
+                        <ENDIF/>
+
+                        <!-- Fade out -->
+                        <IF judge="isWolfEyesFaedOut" />
+                            <IF judge="wolfEyesAlpha>wolfEyesAlphaMin"/>
+                                <Command target="wolfEyesAlpha" value="wolfEyesAlpha-wolfEyesAlphaSpeed" />
+                            <ELSE/>
+                                <Command target="isWolfEyesFaedOut" value="false" />
+                            <ENDIF/>
+                        <ENDIF/>
+
+
+                        <!-- Dragging -->
+                        <!-- Background scale -->
+                        <CallMethod model="bgSphere" method="setScale" args="bgScale" />
+                        <IF judge="mainDragingIcon" />
+                            <IF judge="bgScale>bgScaleMin" />
+                                <Command target="bgScale" value="bgScale-0.04" />
+                            <ENDIF/>
+                        <ELSEIF judge="bgScaleMax>bgScale"/>
+                            <Command target="bgScale" value="bgScale+0.04" />
+                        <ENDIF/>
+
+                    </Function>
+
+                </Script>
+                
+        </Group>
+
+
+
+        <!-- Wolf flash eyes group -->
+        <Group name="flashEyesGroup">
+                <Model name="wolf_flash_eyes" modelType="OBJ" modelfile="model_wolf_flash_eyes" x="0" y="-400" z="0" texture="wolf_eyes_flash_texture" scale="1100" rotationx="15" depthTestEnabled="true">
+                </Model>
+
+                <Model name="wolf_flash_eyes_glow" modelType="OBJ" modelfile="model_wolf_flash_eyes_glow" x="0" y="-425" z="10" texture="wolf_eyes_glow_texture" scale="1100" rotationx="15" depthTestEnabled="true">
+                </Model>
+        </Group>
+
+        <!-- Forest eyes group, with animation -->
+        <Group name="forestEyesGroup">
+            <Image name="forest_eyes_1" x="-380" y="-490" z="30" texture="forest_eyes_texture" width="200" height="75" depthTestEnabled="true">
+            </Image>
+
+            <Image name="forest_eyes_2" x="-230" y="620" z="50" texture="forest_eyes_texture" width="200" height="75" depthTestEnabled="true">
+            </Image>
+
+            <Image name="forest_eyes_3" x="300" y="-270" z="20" texture="forest_eyes_texture" width="200" height="75" depthTestEnabled="true">
+            </Image>
+
+            <Image name="forest_eyes_4" x="420" y="390" z="0" texture="forest_eyes_texture" width="200" height="75" depthTestEnabled="true">
+            </Image>
+
+            <Script>
+                <Function action="onDrawStart">
+
+                    <Command target="time" value="time+0.01" />
+
+                    <!-- Create variable for judge -->
+                    <Var name="eyes_1_currTime" type="float" value="0" />
+                    <Var name="eyes_2_currTime" type="float" value="0" />
+                    <Var name="eyes_3_currTime" type="float" value="0" />
+                    <Var name="eyes_4_currTime" type="float" value="0" />
+
+                    <Command target="eyes_1_currTime" value="time-eyes_1_flashTime" />
+                    <Command target="eyes_2_currTime" value="time-eyes_2_flashTime" />
+                    <Command target="eyes_3_currTime" value="time-eyes_3_flashTime" />
+                    <Command target="eyes_4_currTime" value="time-eyes_4_flashTime" />
+
+
+                    <!-- Detect when to fade in, when to fade -->
+                    <IF judge="eyes_1_timeInterval>eyes_1_currTime"/>
+                        <IF judge="eyes_1_currTime>eyes_1_duration" />
+                            <Command target="isForestEyesFadeIn_1" value="false" />
+                        <ELSE/>
+                            <Command target="isForestEyesFadeIn_1" value="true" />
+                        <ENDIF/> 
+                    <ELSE/>
+                        <Command target="eyes_1_flashTime" value="time" />
+                    <ENDIF/>
+
+                    <IF judge="eyes_2_timeInterval>eyes_2_currTime"/>
+                        <IF judge="eyes_2_currTime>eyes_2_duration" />
+                            <Command target="isForestEyesFadeIn_2" value="false" />
+                        <ELSE/>
+                            <Command target="isForestEyesFadeIn_2" value="true" />
+                        <ENDIF/> 
+                    <ELSE/>
+                        <Command target="eyes_2_flashTime" value="time" />
+                    <ENDIF/>
+
+                    <IF judge="eyes_3_timeInterval>eyes_3_currTime"/>
+                        <IF judge="eyes_3_currTime>eyes_3_duration" />
+                            <Command target="isForestEyesFadeIn_3" value="false" />
+                        <ELSE/>
+                            <Command target="isForestEyesFadeIn_3" value="true" />
+                        <ENDIF/> 
+                    <ELSE/>
+                        <Command target="eyes_3_flashTime" value="time" />
+                    <ENDIF/>
+
+                    <IF judge="eyes_4_timeInterval>eyes_4_currTime"/>
+                        <IF judge="eyes_4_currTime>eyes_4_duration" />
+                            <Command target="isForestEyesFadeIn_4" value="false" />
+                        <ELSE/>
+                            <Command target="isForestEyesFadeIn_4" value="true" />
+                        <ENDIF/>  
+                    <ELSE/>
+                        <Command target="eyes_4_flashTime" value="time" />
+                    <ENDIF/>
+
+
+                    <!-- Fade in, Fade out -->
+                    <IF judge="isForestEyesFadeIn_1"/>
+                        <IF judge="255>eyes_1_alpha"/>
+                            <Command target="eyes_1_alpha" value="eyes_1_alpha+forestEyesFadeSpeed" />
+                            <CallMethod model="forest_eyes_1" method="setAlpha" args="eyes_1_alpha"/>
+                        <ENDIF/>
+                    <ELSEIF judge="eyes_1_alpha>forestEyesAlphaMin"/>
+                        <Command target="eyes_1_alpha" value="eyes_1_alpha-forestEyesFadeSpeed" />
+                        <CallMethod model="forest_eyes_1" method="setAlpha" args="eyes_1_alpha"/>
+                    <ENDIF/>
+
+                    <IF judge="isForestEyesFadeIn_2"/>
+                        <IF judge="255>eyes_2_alpha"/>
+                            <Command target="eyes_2_alpha" value="eyes_2_alpha+forestEyesFadeSpeed" />
+                            <CallMethod model="forest_eyes_2" method="setAlpha" args="eyes_2_alpha"/>
+                        <ENDIF/>
+                    <ELSEIF judge="eyes_2_alpha>forestEyesAlphaMin"/>
+                        <Command target="eyes_2_alpha" value="eyes_2_alpha-forestEyesFadeSpeed" />
+                        <CallMethod model="forest_eyes_2" method="setAlpha" args="eyes_2_alpha"/>
+                    <ENDIF/>
+
+                    <IF judge="isForestEyesFadeIn_3"/>
+                        <IF judge="255>eyes_3_alpha"/>
+                            <Command target="eyes_3_alpha" value="eyes_3_alpha+forestEyesFadeSpeed" />
+                            <CallMethod model="forest_eyes_3" method="setAlpha" args="eyes_3_alpha"/>
+                        <ENDIF/>
+                    <ELSEIF judge="eyes_3_alpha>forestEyesAlphaMin"/>
+                        <Command target="eyes_3_alpha" value="eyes_3_alpha-forestEyesFadeSpeed" />
+                        <CallMethod model="forest_eyes_3" method="setAlpha" args="eyes_3_alpha"/>
+                    <ENDIF/>
+
+                    <IF judge="isForestEyesFadeIn_4"/>
+                        <IF judge="255>eyes_4_alpha"/>
+                            <Command target="eyes_4_alpha" value="eyes_4_alpha+forestEyesFadeSpeed" />
+                            <CallMethod model="forest_eyes_4" method="setAlpha" args="eyes_4_alpha"/>
+                        <ENDIF/>
+                    <ELSEIF judge="eyes_4_alpha>forestEyesAlphaMin"/>
+                        <Command target="eyes_4_alpha" value="eyes_4_alpha-forestEyesFadeSpeed" />
+                        <CallMethod model="forest_eyes_4" method="setAlpha" args="eyes_4_alpha"/>
+                    <ENDIF/>
+
+
+                </Function>
+            </Script>
+        </Group>
+            
+        <Script>
+
+            <!-- 摄像机变量 -->
+            <ValueInterpolator name="cCameraRotationX" speed="0.175" />
+            <ValueInterpolator name="vICameraRotationX" speed="0.175" />
+
+
+            <!-- Mouth movement variable -->
+            <GlobalVar name="isMouthOpen" type="boolean" value="true"/>
+            <GlobalVar name="mouthRotation" type="float" value="15"/>
+            <GlobalVar name="mouthRotationMax" type="float" value="26"/>
+            <GlobalVar name="mouthRotationMin" type="float" value="15"/>
+            <GlobalVar name="mouthRotateSpeed" type="float" value="0.15"/>
+
+
+            <!-- Head normal movement variable -->
+            <GlobalVar name="isHeadRotateLeft" type="boolean" value="true"/>
+            <GlobalVar name="headRotationY" type="float" value="-4"/>
+            <GlobalVar name="headRotationMaxY" type="float" value="4"/>
+            <GlobalVar name="headRotationMinY" type="float" value="-4"/>
+            <GlobalVar name="headRotateSpeedY" type="float" value="0.04"/>
+
+
+            <!-- Eyes flashing effect variable -->
+            <!-- Dragging effect -->
+            <GlobalVar name="wolfEyesAlpha" type="float" value="0" />
+            <GlobalVar name="wolfEyesAlphaMax" type="float" value="255" />
+            <GlobalVar name="wolfEyesAlphaMin" type="float" value="0" />
+            <GlobalVar name="wolfEyesAlphaSpeed" type="float" value="18" />
+            <GlobalVar name="isWolfEyesFaedOut" type="boolean" value="false" />
+
+
+            <!-- Forest eyes variable -->
+            <GlobalVar name="time" type="float" value="0" />
+            <GlobalVar name="forestEyesFadeSpeed" type="float" value="15" />
+            <GlobalVar name="forestEyesAlphaMin" type="float" value="0" />
+
+            <GlobalVar name="eyes_1_flashTime" type="float" value="0" />
+            <GlobalVar name="eyes_1_timeInterval" type="float" value="5" />
+            <GlobalVar name="eyes_1_duration" type="float" value="0.4" />
+            <GlobalVar name="eyes_1_alpha" type="float" value="0" />
+            <GlobalVar name="isForestEyesFadeIn_1" type="boolean" value="false" />
+            
+
+            <GlobalVar name="eyes_2_flashTime" type="float" value="0" />
+            <GlobalVar name="eyes_2_timeInterval" type="float" value="7" />
+            <GlobalVar name="eyes_2_duration" type="float" value="0.5" />
+            <GlobalVar name="eyes_2_alpha" type="float" value="0" />
+            <GlobalVar name="isForestEyesFadeIn_2" type="boolean" value="false" />
+
+            <GlobalVar name="eyes_3_flashTime" type="float" value="0" />
+            <GlobalVar name="eyes_3_timeInterval" type="float" value="3" />
+            <GlobalVar name="eyes_3_duration" type="float" value="0.5" />
+            <GlobalVar name="eyes_3_alpha" type="float" value="0" />
+            <GlobalVar name="isForestEyesFadeIn_3" type="boolean" value="false" />
+
+            <GlobalVar name="eyes_4_flashTime" type="float" value="0" />
+            <GlobalVar name="eyes_4_timeInterval" type="float" value="4" />
+            <GlobalVar name="eyes_4_duration" type="float" value="0.3" />
+            <GlobalVar name="eyes_4_alpha" type="float" value="0" />
+            <GlobalVar name="isForestEyesFadeIn_4" type="boolean" value="false" />
+
+
+            <!-- Y轴深度，用于拖动图标 -->
+            <GlobalVar name="bgScaleMax" type="float" value="1"/>
+            <GlobalVar name="bgScaleMin" type="float" value="0.4"/>
+            <GlobalVar name="bgScale" type="float" value="1" />
+
+
+            <!-- 手势跟随变量 -->
+            <GlobalVar name="mainDragingIcon" type="boolean" value="false" />
+            <GlobalVar name="mainEffectRunning" type="boolean" value="false" />
+
+            <GlobalVar name="rotationX" type="float" value="0"/>
+
+            <!-- 设置重力传感器 -->
+            <Function action="onSensorChanged">
+                <Var name="sensorY" type="float" value="0"/>
+                <Var name="sensor_min" type="float" value="0"/>
+                <Var name="sensor_max" type="float" value="9"/>
+                <IF judge="sensor_min>onSensorChanged_sensorY"/>
+                    <Command target="sensorY" value="0"/>
+                <ELSE/>
+                    <Command target="sensorY" value="onSensorChanged_sensorY"/>
+                <ENDIF/>
+                <IF judge="sensor_min>onSensorChanged_sensorZ"/>
+                    <IF judge="sensor_max>sensorY"/>
+                        <Command target="sensorY" value="sensor_max"/>
+                    <ENDIF/>
+                <ENDIF/>
+                <Var name="rotationX" type="float" value="0"/>
+                <IF judge="onSensorChanged_sensorZ>sensor_min"/>
+                    <Command target="rotationX" value="35*(9.78-sensorY)/10"/>
+                <ELSE/>
+                    <Command target="rotationX" value="180*(sensorY-9.78)/10"/>
+                <ENDIF/>
+                <CallMethod model="cCameraRotationX" method="setTargetValue" args="rotationX"/>
+            </Function>
+
+            <!-- 开始绘制wallpaper -->
+            <Function action="drawWallpaper">
+                <Var name="scaleUnit" type="float" value="0" />
+                <Command target="scaleUnit" value="drawWallpaper_width/1080f"/>
+                <CallMethod model="cCameraRotationX" method="step"/>
+
+                <!-- 初始化 -->
+                <CallMethod model="bgSphere" method="setScaleUnit" args="scaleUnit"/>
+                <CallMethod model="wolfGroup" method="setScaleUnit" args="scaleUnit"/>
+                <CallMethod model="flashEyesGroup" method="setScaleUnit" args="scaleUnit"/>
+                <CallMethod model="forestEyesGroup" method="setScaleUnit" args="scaleUnit"/>
+
+                <CallMethod model="bgSphere" method="dispatchDraw"/>
+                <CallMethod model="wolfGroup" method="dispatchDraw"/>
+                <CallMethod model="flashEyesGroup" method="dispatchDraw"/>
+                <CallMethod model="forestEyesGroup" method="dispatchDraw"/>
+
+                <CallMethod model="bgSphere" method="setAlpha" args="255"/>
+                <CallMethod model="wolfGroup" method="setAlpha" args="255"/>
+                <CallMethod model="flashEyesGroup" method="setAlpha" args="255"/>
+                <CallMethod model="forestEyesGroup" method="setAlpha" args="255"/>
+
+                <!--添加粒子-->
+                <CallMethod model="touchfollow" method="dispatchDraw"/>
+                <CallMethod model="particleeffect" method="dispatchDraw"/>
+<!--                 <CallMethod model="mouthparticles" method="dispatchDraw"/>
+ -->            </Function>
+
+            <!-- 滑屏动效开始 -->
+            <Function action="onDesktopEffectStart">
+                <Command target="mainEffectRunning" value="true" />
+                <Command target="isMouthOpen" value="true"/>
+<!--                 <CallMethod model="mouthparticles" method="start" args="0,0-400,0-100"/>
+ -->            </Function>
+
+            <!-- 滑屏动效结束 -->
+            <Function action="onDesktopEffectEnd">
+                <Command target="mainEffectRunning" value="false" />
+            </Function>
+
+            <!-- 拖动图标开始 -->
+            <Function action="onIconStartDrag">
+                <Command target="mainDragingIcon" value="true" />
+            </Function>
+
+            <!-- 拖动图标开始结束 -->
+            <Function action="onIconEndDrag">
+                <Command target="mainDragingIcon" value="false" />
+            </Function>
+
+            <Function action="onTouchMove">
+                <CallMethod target="clickConvertResult" model="ThemeCommonUtils" method="conversionCoordinatesSG" args="onTouchMove_x,onTouchMove_y" />
+                <Command target="cx" value="[cffa0]" />
+                <Method name="cffa0" model="ThemeCommonUtils" method="getFloatFromArray" args="clickConvertResult,0" argsType="object" />
+                <Command target="cy" value="[cffa1]" />
+                <Method name="cffa1" model="ThemeCommonUtils" method="getFloatFromArray" args="clickConvertResult,1" argsType="object" />
+                <CallMethod model="touchfollow" method="start" args="cx,cy"/>
+            </Function>
+
+        </Script>
+
+    </Wallpaper>
+
+	<ElementEffectCore name="effectcore">
+	</ElementEffectCore>
+</Theme>

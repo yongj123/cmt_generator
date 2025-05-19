@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<themeIcons xmlns:livelauncher="http://schemas.android.com/apk/res-auto/" >
+
+    <!-- sy_icon_type:0:system_app_icon,1:normal_app_icon,2:custom_app_icon -->
+    <icons livelauncher:icon_type="0" >
+        <icon
+            livelauncher:icon="icons/browser.png"
+            livelauncher:icon_name="browser" />
+        <icon
+            livelauncher:icon="icons/calculator.png"
+            livelauncher:icon_name="calculator" />
+        <icon
+            livelauncher:icon="icons/calendar.png"
+            livelauncher:icon_name="calendar" />
+        <icon
+            livelauncher:icon="icons/camera.png"
+            livelauncher:icon_name="camera" />
+        <icon
+            livelauncher:icon="icons/clock.png"
+            livelauncher:icon_name="clock" />
+        <icon
+            livelauncher:icon="icons/contact.png"
+            livelauncher:icon_name="contact" />
+        <icon
+            livelauncher:icon="icons/download.png"
+            livelauncher:icon_name="download" />
+        <icon
+            livelauncher:icon="icons/email.png"
+            livelauncher:icon_name="email" />
+        <icon
+            livelauncher:icon="icons/filemanager.png"
+            livelauncher:icon_name="filemanager" />
+        <icon
+            livelauncher:icon="icons/flashlight.png"
+            livelauncher:icon_name="flashlight" />
+        <icon
+            livelauncher:icon="icons/message.png"
+            livelauncher:icon_name="message" />
+        <icon
+            livelauncher:icon="icons/music.png"
+            livelauncher:icon_name="music" />
+        <icon
+            livelauncher:icon="icons/phone.png"
+            livelauncher:icon_name="phone" />
+        <icon
+            livelauncher:icon="icons/record.png"
+            livelauncher:icon_name="record" />
+        <icon
+            livelauncher:icon="icons/settings.png"
+            livelauncher:icon_name="settings" />
+        <icon
+            livelauncher:icon="icons/video.png"
+            livelauncher:icon_name="video" />
+    </icons>
+    <icons livelauncher:icon_type="1" >
+        <icon
+            livelauncher:icon="icons/hap_hea.png"
+            livelauncher:icon_name="ComponentInfo{com.haphea.mguard/com.sheep.security.main.MainActivity}" />
+        <icon
+            livelauncher:icon="icons/hap_hea.png"
+            livelauncher:icon_name="ComponentInfo{com.haphea.mguard_cn/com.sheep.security.main.MainActivity}" />
+        <icon
+            livelauncher:icon="icons/kbd_ic_saving.png"
+            livelauncher:icon_name="ComponentInfo{com.gold.kbatterydoctor/com.gold.kbatterydoctor.SplashActivity}" />
+        <icon
+            livelauncher:icon="icons/kbd_ic_saving.png"
+            livelauncher:icon_name="ComponentInfo{com.gold.kbatterydoctor_en/com.gold.kbatterydoctor.SplashActivity}" />
+         <icon
+            livelauncher:icon="icons/message_spirit.png"
+            livelauncher:icon_name="ComponentInfo{com.king.launcher.plugin.unread/com.king.launcher.plugin.unread.MessageElvesActivity}" />
+         <icon
+            livelauncher:icon="icons/sy_security.png"
+            livelauncher:icon_name="ComponentInfo{com.haphea.security/wang.sy.antivirus.main.SplashActivity}" />
+         <icon
+            livelauncher:icon="icons/sy_security.png"
+            livelauncher:icon_name="ComponentInfo{com.haphea.security_cn/wang.sy.antivirus.main.SplashActivity}" />
+         <icon
+            livelauncher:icon="icons/sy_security.png"
+            livelauncher:icon_name="ComponentInfo{com.haphea.security_x86/wang.sy.antivirus.main.SplashActivity}" />
+         <icon
+            livelauncher:icon="icons/sy_latch.png"
+            livelauncher:icon_name="ComponentInfo{com.sys.locker/com.haphea.ui.cover.MainActivity}" />
+         
+         <icon
+            livelauncher:icon="icons/youtube.png"
+            livelauncher:icon_name="ComponentInfo{com.google.android.youtube/com.google.android.youtube.app.honeycomb.Shell$HomeActivity}" />
+         <icon
+            livelauncher:icon="icons/instagram.png"
+            livelauncher:icon_name="ComponentInfo{com.instagram.android/com.instagram.android.activity.MainTabActivity}" />
+         <icon
+            livelauncher:icon="icons/skype.png"
+            livelauncher:icon_name="ComponentInfo{com.skype.polaris/com.skype.raider.Main}" />
+		<icon
+            livelauncher:icon="icons/skype.png"
+            livelauncher:icon_name="ComponentInfo{com.skype.raider/com.skype.raider.Main}" />
+         <icon
+            livelauncher:icon="icons/twitter.png"
+            livelauncher:icon_name="ComponentInfo{com.twitter.android/com.twitter.android.StartActivity}" />
+         <icon
+            livelauncher:icon="icons/facebook.png"
+            livelauncher:icon_name="ComponentInfo{com.facebook.katana/com.facebook.katana.LoginActivity}" />
+         <icon
+            livelauncher:icon="icons/usyobile.png"
+            livelauncher:icon_name="ComponentInfo{com.UCMobile.intl/com.UCMobile.main.UCMobile}" />
+         <icon
+            livelauncher:icon="icons/whatsapp.png"
+            livelauncher:icon_name="ComponentInfo{com.whatsapp/com.whatsapp.Main}" />
+         <icon
+            livelauncher:icon="icons/messenger.png"
+            livelauncher:icon_name="ComponentInfo{com.facebook.orca/com.facebook.orca.auth.StartScreenActivity}" />
+         <icon
+            livelauncher:icon="icons/chrome.png"
+            livelauncher:icon_name="ComponentInfo{com.android.chrome/com.google.android.apps.chrome.Main}" />
+         <icon
+            livelauncher:icon="icons/snapchat.png"
+            livelauncher:icon_name="ComponentInfo{com.snapchat.android/com.snapchat.android.LandingPageActivity}" />
+         <icon
+            livelauncher:icon="icons/sy_browser.png"
+            livelauncher:icon_name="ComponentInfo{com.king.cb/com.gold.browser.screen.SplashActivity}" />
+         <icon
+            livelauncher:icon="icons/sy_browser.png"
+            livelauncher:icon_name="ComponentInfo{com.king.cb/com.gold.browser.screen.BrowserActivity}" />
+         <icon
+            livelauncher:icon="icons/gmail.png"
+            livelauncher:icon_name="ComponentInfo{com.google.android.gm/com.google.android.gm.ConversationListActivityGmail}" />
+         <icon
+            livelauncher:icon="icons/line.png"
+            livelauncher:icon_name="ComponentInfo{jp.naver.line.android/jp.naver.line.android.activity.SplashActivity}" />
+        <icon
+            livelauncher:icon="icons/googleplay.png"
+            livelauncher:icon_name="ComponentInfo{com.android.vending/com.android.vending.AssetBrowserActivity}" />
+        <icon
+            livelauncher:icon="icons/googlemaps.png"
+            livelauncher:icon_name="ComponentInfo{com.google.android.apps.maps/com.google.android.maps.MapsActivity}" />
+        <icon
+            livelauncher:icon="icons/googleplus.png"
+            livelauncher:icon_name="ComponentInfo{com.google.android.apps.plus/com.google.android.apps.plus.phone.HomeActivity}" />
+        <icon
+            livelauncher:icon="icons/bbm.png"
+            livelauncher:icon_name="ComponentInfo{com.bbm/com.bbm.ui.activities.StartupActivity}" />
+        <icon
+            livelauncher:icon="icons/viber.png"
+            livelauncher:icon_name="ComponentInfo{com.viber.voip/com.viber.voip.WelcomeActivity}" />
+		<icon
+            livelauncher:icon="icons/google.png"
+            livelauncher:icon_name="ComponentInfo{com.google.android.googlequicwangearchbox/com.google.android.googlequicwangearchbox.SearchActivity}" />
+        <icon
+            livelauncher:icon="icons/googleplaygames.png"
+            livelauncher:icon_name="ComponentInfo{com.google.android.play.games/com.google.android.gms.games.ui.destination.main.MainActivity}" />
+        <icon
+            livelauncher:icon="icons/vk.png"
+            livelauncher:icon_name="ComponentInfo{com.vkontakte.android/com.vkontakte.android.MainActivity}" />
+        <icon
+            livelauncher:icon="icons/snapchat.png"
+            livelauncher:icon_name="ComponentInfo{com.snapchat.android/com.snapchat.android.LandingPageActivity}" />
+        <icon
+            livelauncher:icon="icons/twitter.png"
+            livelauncher:icon_name="ComponentInfo{com.twitter.android/com.twitter.android.StartActivity}" />
+        <icon
+            livelauncher:icon="icons/googleplaymusic.png"
+            livelauncher:icon_name="ComponentInfo{com.google.android.music/com.android.music.activitymanagement.TopLevelActivity}" />
+        <icon
+            livelauncher:icon="icons/googlephotos.png"
+            livelauncher:icon_name="ComponentInfo{com.google.android.apps.photos/com.google.android.apps.photos.home.HomeActivity}" />
+        <icon
+            livelauncher:icon="icons/gallery.png"
+            livelauncher:icon_name="ComponentInfo{com.sonyericsson.album/com.sonyericsson.album.MainActivity}" />
+        <icon
+            livelauncher:icon="icons/gallery.png"
+            livelauncher:icon_name="ComponentInfo{com.cooliris.media/com.cooliris.media.Gallery}" />
+        <icon
+            livelauncher:icon="icons/gallery.png"
+            livelauncher:icon_name="ComponentInfo{com.google.android.gallery3d/com.cooliris.media.Gallery}" />
+        <icon
+            livelauncher:icon="icons/gallery.png"
+            livelauncher:icon_name="ComponentInfo{com.android.camera/com.android.camera.GalleryPicker}" />
+        <icon
+            livelauncher:icon="icons/gallery.png"
+            livelauncher:icon_name="ComponentInfo{com.htc.album/com.htc.album.AlbumMain.ActivityMainDropList}" />
+        <icon
+            livelauncher:icon="icons/gallery.png"
+            livelauncher:icon_name="ComponentInfo{com.google.android.gallery3d/com.android.gallery3d.app.Gallery}" />
+        <icon
+            livelauncher:icon="icons/gallery.png"
+            livelauncher:icon_name="ComponentInfo{com.htc.album/com.htc.album.addons.ActivityImageViewer}" />
+        <icon
+            livelauncher:icon="icons/gallery.png"
+            livelauncher:icon_name="ComponentInfo{com.google.android.gallery3d/com.android.gallery3d.app.GalleryActivity}" />
+        <icon
+            livelauncher:icon="icons/gallery.png"
+            livelauncher:icon_name="ComponentInfo{com.android.gallery3d/com.android.gallery3d.app.Gallery}" />
+        <icon
+            livelauncher:icon="icons/gallery.png"
+            livelauncher:icon_name="ComponentInfo{com.miui.gallery/com.miui.gallery.app.Gallery}" />
+        <icon
+            livelauncher:icon="icons/gallery.png"
+            livelauncher:icon_name="ComponentInfo{com.sec.android.gallery3d/com.sec.android.gallery3d.app.GalleryActivity}" />
+        <icon
+            livelauncher:icon="icons/gallery.png"
+            livelauncher:icon_name="ComponentInfo{com.sec.android.gallery3d/com.sec.android.gallery3d.app.Gallery}" />
+        <icon
+            livelauncher:icon="icons/gallery.png"
+            livelauncher:icon_name="ComponentInfo{com.htc.album/com.htc.album.AlbumMain.ActivityMainTabHost}" />
+        <icon
+            livelauncher:icon="icons/gallery.png"
+            livelauncher:icon_name="ComponentInfo{com.motorola.motgallery/com.motorola.cgallery.Dashboard}" />
+        <icon
+            livelauncher:icon="icons/gallery.png"
+            livelauncher:icon_name="ComponentInfo{com.motorola.MotGallery2/com.android.gallery3d.app.GalleryActivity}" />
+        <icon
+            livelauncher:icon="icons/gallery.png"
+            livelauncher:icon_name="ComponentInfo{com.oppo.gallery3d/com.oppo.gallery3d.app.Gallery}" />
+        <icon
+            livelauncher:icon="icons/gallery.png"
+            livelauncher:icon_name="ComponentInfo{com.motorola.MotGallery2/com.android.gallery3d.app.Gallery}" />
+        <icon
+            livelauncher:icon="icons/gallery.png"
+            livelauncher:icon_name="ComponentInfo{com.android.gallery3d/com.android.gallery3d.app.GalleryActivity}" />
+        <icon
+            livelauncher:icon="icons/gallery.png"
+            livelauncher:icon_name="ComponentInfo{com.android.gallery3d/com.huawei.gallery.app.GalleryActivity}" />
+    </icons>
+    <icons livelauncher:icon_type="2" >
+        <icon
+            livelauncher:icon="icons/hap_hea.png"
+            livelauncher:icon_name="com.king.launcher.customitem.CleanMasterShortcutInfo" />
+        <icon
+            livelauncher:icon="icons/sy_club.png"
+            livelauncher:icon_name="com.king.launcher.customitem.CMClubShortcutInfo" />
+        <icon
+            livelauncher:icon="icons/desktop_setting_feedback.png"
+            livelauncher:icon_name="com.king.launcher.customitem.FeedbackShortcutInfo" />
+        <icon
+            livelauncher:icon="icons/message_spirit.png"
+            livelauncher:icon_name="com.king.launcher.customitem.MessageSpiritShortcutInfo" />
+        <icon
+            livelauncher:icon="icons/theme.png"
+            livelauncher:icon_name="com.king.launcher.customitem.ThemeShortcutInfo" />
+        <icon
+            livelauncher:icon="icons/wallpaper.png"
+            livelauncher:icon_name="com.king.launcher.customitem.WallpaperShortcutInfo" />
+        <icon
+            livelauncher:icon="icons/widget_all_apps.png"
+            livelauncher:icon_name="com.king.launcher.customitem.AllAppsShortcutInfo" />
+        <icon
+            livelauncher:icon="icons/market.png"
+            livelauncher:icon_name="com.king.launcher.customitem.MarketShortcutInfo" />
+        <icon
+            livelauncher:icon="icons/change_wallpaper.png"
+            livelauncher:icon_name="com.king.launcher.customitem.ChangeWallpaperShortcutInfo" />
+        <icon
+            livelauncher:icon="icons/widget_recently.png"
+            livelauncher:icon_name="com.king.launcher.customitem.RecentlyOpenedShortcutInfo" />
+        <icon
+            livelauncher:icon="icons/kbd_ic_saving.png"
+            livelauncher:icon_name="com.king.launcher.customitem.BatteryShortcutInfo" />
+        <icon
+            livelauncher:icon="icons/app_manager.png"
+            livelauncher:icon_name="com.king.launcher.customitem.AppManagerShortcutInfo" />
+        <icon
+            livelauncher:icon="icons/sy_latch.png"
+            livelauncher:icon_name="com.king.launcher.customitem.CMClockShortcutInfo" />
+        <icon
+            livelauncher:icon="icons/sy_security.png"
+            livelauncher:icon_name="com.king.launcher.customitem.CMSecurityShortcutInfo" />
+        <icon
+            livelauncher:icon="icons/gprs.png"
+            livelauncher:icon_name="com.king.launcher.customitem.NetManagerShortcutInfo" />
+        <icon
+            livelauncher:icon="icons/sy_browser.png"
+            livelauncher:icon_name="com.king.launcher.customitem.CMBrowserShortcutInfo" />
+        <icon
+            livelauncher:icon="icons/sort_apps.png"
+            livelauncher:icon_name="com.king.launcher.customitem.SortAppsShortcutInfo" />
+    </icons>
+
+</themeIcons>

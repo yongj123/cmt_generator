@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= theme.name %> 主题 - CMT 主题生成工具</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="bg-dark text-white py-3">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1><a href="/" class="text-white text-decoration-none">CMT 主题生成工具</a></h1>
+            </div>
+        </div>
+    </header>
+
+    <main class="container my-4">
+        <div class="row mb-4">
+            <div class="col-12">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">首页</a></li>
+                        <li class="breadcrumb-item active" aria-current="page"><%= theme.name %> 主题</li>
+                    </ol>
+                </nav>
+                
+                <h2><%= theme.name %> 主题定制</h2>
+                <p>您可以替换主题中对应的文件，点击生成CMT文件。</p>
+                
+                <div class="d-flex justify-content-between mb-3">
+                    <button id="resetBtn" class="btn btn-warning">
+                        <i class="bi bi-arrow-counterclockwise"></i> 重置为原始状态
+                    </button>
+                    
+                    <button id="generateBtn" class="btn btn-success">
+                        <i class="bi bi-file-earmark-zip"></i> 生成 CMT 文件
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">主题文件</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="fileTree" class="file-tree">
+                            <%- renderFileTree(fileTree, '', theme.id) %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="uploadModalLabel">上传文件</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="uploadForm">
+                            <input type="hidden" id="filePath" name="filePath">
+                            <div class="mb-3">
+                                <label for="fileUpload" class="form-label">选择文件以替换 <span id="fileNamePlaceholder"></span></label>
+                                <input class="form-control" type="file" id="fileUpload" name="file" required>
+                                <div class="form-text" id="fileExtensionHelp">文件必须具有与原始文件相同的扩展名。</div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" id="uploadBtn">上传</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-labelledby="imagePreviewModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="imagePreviewModalLabel">图片预览</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img id="previewImage" src="" alt="预览图片" class="img-fluid">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                        <a id="downloadImageLink" href="" download class="btn btn-primary">下载图片</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-white py-3 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">内部工具 - 仅供内部使用</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/js/script.js"></script>
+    
+    <script>
+        // Global variables
+        const themeId = '<%= theme.id %>';
+        
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup upload file buttons
+            setupUploadButtons();
+            
+            // Reset button
+            document.getElementById('resetBtn').addEventListener('click', resetTheme);
+            
+            // Generate CMT button
+            document.getElementById('generateBtn').addEventListener('click', generateCMT);
+            
+            // Upload button in modal
+            document.getElementById('uploadBtn').addEventListener('click', uploadFile);
+            
+            // 文件预览功能
+            document.querySelectorAll('.file-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const isImage = this.getAttribute('data-is-image') === 'true';
+                    const fileName = this.getAttribute('data-file-name');
+                    const filePath = this.getAttribute('data-file-path');
+                    const fileUrl = `/preview/${themeId}/${filePath}`;
+                    
+                    if (isImage) {
+                        // 显示图片预览模态框
+                        document.getElementById('imagePreviewModalLabel').textContent = fileName;
+                        document.getElementById('previewImage').src = fileUrl;
+                        document.getElementById('downloadImageLink').href = fileUrl;
+                        const imageModal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+                        imageModal.show();
+                    } else {
+                        // 非图片文件直接下载
+                        window.location.href = fileUrl;
+                    }
+                });
+            });
+        });
+        
+        // Setup upload buttons for each file
+        function setupUploadButtons() {
+            const uploadBtns = document.querySelectorAll('.upload-btn');
+            uploadBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const filePath = this.getAttribute('data-path');
+                    const fileName = this.getAttribute('data-name');
+                    const fileExtension = this.getAttribute('data-extension');
+                    
+                    document.getElementById('filePath').value = filePath;
+                    document.getElementById('fileNamePlaceholder').textContent = fileName;
+                    document.getElementById('fileExtensionHelp').textContent = 
+                        '文件必须具有扩展名 ' + fileExtension;
+                    
+                    const uploadModal = new bootstrap.Modal(document.getElementById('uploadModal'));
+                    uploadModal.show();
+                });
+            });
+        }
+        
+        // Upload file
+        function uploadFile() {
+            const form = document.getElementById('uploadForm');
+            const formData = new FormData();
+            const fileInput = document.getElementById('fileUpload');
+            const filePath = document.getElementById('filePath').value;
+            
+            if (!fileInput.files[0]) {
+                Swal.fire({
+                    icon: 'error',
+                    title: '未选择文件',
+                    text: '请选择要上传的文件。'
+                });
+                return;
+            }
+            
+            // 显式添加filePath字段
+            formData.append('filePath', filePath);
+            formData.append('file', fileInput.files[0]);
+            
+            fetch('/upload/' + themeId, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '文件已上传',
+                        text: '文件已成功替换。'
+                    }).then(() => {
+                        bootstrap.Modal.getInstance(document.getElementById('uploadModal')).hide();
+                        document.getElementById('uploadForm').reset();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '上传失败',
+                        text: data.error || '上传过程中发生错误。'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: '上传失败',
+                    text: '上传文件时发生错误。'
+                });
+            });
+        }
+        
+        // Reset theme
+        function resetTheme() {
+            Swal.fire({
+                title: '确定要重置吗？',
+                text: '这将把所有更改重置为原始主题',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: '是的，重置它！',
+                cancelButtonText: '取消'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('/reset/' + themeId, {
+                        method: 'POST'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: '重置成功',
+                                text: '主题已重置为原始状态。'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: '重置失败',
+                                text: data.error || '重置过程中发生错误。'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: '重置失败',
+                            text: '重置主题时发生错误。'
+                        });
+                    });
+                }
+            });
+        }
+        
+        // Generate CMT file
+        function generateCMT() {
+            Swal.fire({
+                title: '正在生成 CMT 文件',
+                text: '请稍候...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                    
+                    fetch('/generate/' + themeId, {
+                        method: 'POST'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'CMT 已生成',
+                                text: 'CMT 文件已成功生成。',
+                                confirmButtonText: '下载',
+                                showCancelButton: true,
+                                cancelButtonText: '取消'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = data.downloadPath;
+                                }
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: '生成失败',
+                                text: data.error || '生成 CMT 文件时出错。'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: '生成失败',
+                            text: '生成 CMT 文件时发生错误。'
+                        });
+                    });
+                }
+            });
+        }
+    </script>
+    
+<% 
+function renderFileTree(items, prefix, themeId) {
+    let result = '<ul class="tree-list"' + (prefix ? ' style="display: none;"' : '') + '>';
+    
+    items.forEach(item => {
+        if (item.type === 'directory') {
+            result += `
+                <li class="tree-folder">
+                    <span class="folder-name"><i class="bi bi-folder"></i> ${item.name}</span>
+                    ${renderFileTree(item.children, prefix + item.name + '/', themeId)}
+                </li>
+            `;
+        } else {
+            const isImage = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'].includes(item.extension.toLowerCase());
+            const previewUrl = `/preview/${themeId}/${item.path}`;
+            const fileIconClass = isImage ? 'bi-file-earmark-image' : 'bi-file-earmark';
+            
+            result += `
+                <li class="tree-file">
+                    <span class="file-name">
+                        <i class="bi ${fileIconClass}"></i> 
+                        <a href="${previewUrl}" class="file-link" data-is-image="${isImage}" data-file-name="${item.name}" data-file-path="${item.path}">${item.name}</a>
+                    </span>
+                    <button class="btn btn-sm btn-primary upload-btn" 
+                        data-path="${item.path}" 
+                        data-name="${item.name}"
+                        data-extension="${item.extension}">
+                        <i class="bi bi-upload"></i> 替换
+                    </button>
+                </li>
+            `;
+        }
+    });
+    
+    result += '</ul>';
+    return result;
+}
+%> 
+</body>
+</html>

@@ -1,0 +1,43 @@
+{
+  "name": "cmt-generator",
+  "version": "1.0.0",
+  "description": "Tool for generating CMT theme files",
+  "main": "electron.js",
+  "author": "CMT Generator Team",
+  "scripts": {
+    "start": "node app.js",
+    "electron:dev": "electron .",
+    "build": "./node_modules/.bin/electron-builder --mac --arm64"
+  },
+  "build": {
+    "appId": "com.cmt.generator",
+    "productName": "CMT Generator",
+    "mac": {
+      "icon": "build/icons/icon.png",
+      "target": [
+        {
+          "target": "zip",
+          "arch": ["arm64"]
+        }
+      ]
+    },
+    "asarUnpack": [
+      "assets/**/*"
+    ],
+    "directories": {
+      "output": "dist"
+    }
+  },
+  "dependencies": {
+    "archiver": "^6.0.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-fileupload": "^1.4.3",
+    "fs-extra": "^11.2.0",
+    "portfinder": "^1.0.32"
+  },
+  "devDependencies": {
+    "electron": "^30.0.1",
+    "electron-builder": "^24.13.3"
+  }
+}
