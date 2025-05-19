@@ -6,7 +6,6 @@ const CmtGenerator = require('./cmtGenerator');
 const portfinder = require('portfinder');
 
 const app = express();
-const PORT = process.env.PORT || 3333;
 
 // Set up EJS as the template engine
 app.set('view engine', 'ejs');
@@ -270,31 +269,51 @@ app.post('/reset/:themeId', async (req, res) => {
 
 // Start the server
 const startServer = async () => {
-    try {
-        if (!PORT) { // If port is not set by env or env value was invalid
-            const port = await portfinder.getPortPromise({
-                port: 3333,    // Default port to start searching from
-                stopPort: 3383 // Port to stop searching at
-            });
-        }
+    let portToListenOn;
 
-        const server = app.listen(PORT, () => {
-            console.log(`Server is running on http://localhost:${PORT}`);
-            if (process.send) {
-                process.send('SERVER_STARTED');
-            }
-        });
-
-        server.on('error', (err) => {
-            console.error("Error finding an open port with portfinder:", err);
-            console.error("Please ensure a port in the range (e.g., 3333-3383) is available, or specify one with the PORT environment variable if you are running app.js directly.");
+    if (process.env.PORT) {
+        portToListenOn = parseInt(process.env.PORT, 10);
+        if (isNaN(portToListenOn)) {
+            console.error(`Error: Invalid PORT environment variable value "${process.env.PORT}". It must be a number.`);
             process.exit(1);
-        });
-    } catch (portfinderError) { // This catch is specifically for portfinder errors
-        console.error("Error finding an open port with portfinder:", portfinderError);
-        console.error("Please ensure a port in the range (e.g., 3333-3383) is available, or specify one with the PORT environment variable if you are running app.js directly.");
-        process.exit(1);
+            return;
+        }
+    } else {
+        // Not running on Vercel or similar (no process.env.PORT), find a port for local dev
+        try {
+            portToListenOn = await portfinder.getPortPromise({
+                port: 3333,    // Default port to start searching from
+                stopPort: 3383 // Upper limit for port search
+            });
+        } catch (err) {
+            console.error("Failed to find an available port using portfinder:", err);
+            console.error("Please ensure a port in the range 3333-3383 is free, or specify one using the PORT environment variable if applicable.");
+            process.exit(1);
+            return; 
+        }
     }
-}
+
+    const server = app.listen(portToListenOn, () => {
+        console.log(`Server is running on http://localhost:${portToListenOn}`);
+        if (process.send) { // For Electron IPC
+            process.send('SERVER_STARTED');
+        }
+    });
+
+    server.on('error', (err) => { 
+        if (err.code === 'EADDRINUSE') {
+            console.error(`Error: Port ${portToListenOn} is already in use.`);
+            if (process.env.PORT) {
+                console.error(`This port was specified by the PORT environment variable.`);
+            } else {
+                console.error(`The default port or a port found by portfinder is in use.`);
+            }
+            console.error("Please try again, free the port, or specify a different PORT environment variable if applicable.");
+        } else {
+            console.error("Failed to start server:", err);
+        }
+        process.exit(1);
+    });
+};
 
 startServer(); // 调用异步函数来启动服务器 
