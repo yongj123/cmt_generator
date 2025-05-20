@@ -103,17 +103,12 @@ class CmtGenerator {
         const appPath = process.env.APP_PATH;
         let assetsRoot;
 
-        if (appPath && appPath.includes('app.asar')) {
-            // Packaged app: assets are in app.asar.unpacked
-            assetsRoot = path.join(path.dirname(appPath), 'app.asar.unpacked', 'assets');
-        } else if (appPath) {
-            // Development: assets are relative to appPath (project root)
+        if (appPath) {
+            // 使用环境变量提供的路径
             assetsRoot = path.join(appPath, 'assets');
         } else {
-            // Fallback for safety, though APP_PATH should always be set
-            // This assumes cmtGenerator.js and assets are relative to __dirname in a flat structure or common root
+            // 默认使用相对于当前文件的路径
             assetsRoot = path.join(__dirname, 'assets');
-            console.warn('APP_PATH environment variable not found, falling back to __dirname for assets path. This might be incorrect in packaged app.');
         }
 
         return [

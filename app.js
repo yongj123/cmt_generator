@@ -23,8 +23,7 @@ app.use(fileUpload({
 }));
 
 // Create temp and output directories
-// Use paths from environment variables if provided (by Electron main process), 
-// otherwise, fallback to __dirname relative paths for direct execution (e.g. npm start).
+// 为Vercel部署和本地开发环境提供临时目录和输出目录
 const TEMP_DIR = process.env.APP_TEMP_DIR || path.join(require('os').tmpdir(), 'cmt_generator_temp');
 const OUTPUT_DIR = process.env.APP_OUTPUT_DIR || path.join(require('os').tmpdir(), 'cmt_generator_output');
 
@@ -295,9 +294,6 @@ const startServer = async () => {
 
     const server = app.listen(portToListenOn, () => {
         console.log(`Server is running on http://localhost:${portToListenOn}`);
-        if (process.send) { // For Electron IPC
-            process.send('SERVER_STARTED');
-        }
     });
 
     server.on('error', (err) => { 
