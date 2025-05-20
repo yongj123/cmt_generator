@@ -74,8 +74,18 @@ body {
 }
 
 /* Button styles */
-.upload-btn {
+.upload-btn, .upload-folder-btn {
     white-space: nowrap;
+}
+
+.tree-folder > div {
+    margin-bottom: 5px;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.tree-folder > div:hover {
+    background-color: #f0f0f0;
 }
 
 /* Image preview styles */

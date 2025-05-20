@@ -28,10 +28,9 @@
                 </nav>
                 
                 <h2><%= theme.name %> 主题定制</h2>
-                <p>您可以替换主题中对应的文件，点击生成CMT文件。</p>
                 
                 <div class="d-flex justify-content-between mb-3">
-                    <button id="resetBtn" class="btn btn-warning">
+                    <button id="resetBtn" class="btn btn-secondary">
                         <i class="bi bi-arrow-counterclockwise"></i> 重置为原始状态
                     </button>
                     
@@ -81,6 +80,32 @@
                 </div>
             </div>
         </div>
+        
+        <div class="modal fade" id="uploadFolderModal" tabindex="-1" aria-labelledby="uploadFolderModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="uploadFolderModalLabel">上传文件夹</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="uploadFolderForm">
+                            <input type="hidden" id="folderPath" name="folderPath">
+                            <div class="mb-3">
+                                <label for="folderUpload" class="form-label">选择文件夹以替换 <span id="folderNamePlaceholder"></span></label>
+                                <p class="text-muted">请将文件夹压缩为ZIP文件后上传</p>
+                                <input class="form-control" type="file" id="folderUpload" name="folder" accept=".zip" required>
+                                <div class="form-text">请上传ZIP格式的压缩文件，包含要替换的文件夹内容。</div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" id="uploadFolderBtn">上传</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-labelledby="imagePreviewModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
@@ -117,8 +142,11 @@
         
         // Event listeners
         document.addEventListener('DOMContentLoaded', function() {
-            // Setup upload file buttons
+            // Setup upload buttons
             setupUploadButtons();
+            
+            // Setup upload folder buttons
+            setupUploadFolderButtons();
             
             // Reset button
             document.getElementById('resetBtn').addEventListener('click', resetTheme);
@@ -128,6 +156,9 @@
             
             // Upload button in modal
             document.getElementById('uploadBtn').addEventListener('click', uploadFile);
+            
+            // Upload folder button in modal
+            document.getElementById('uploadFolderBtn').addEventListener('click', uploadFolder);
             
             // 文件预览功能
             document.querySelectorAll('.file-link').forEach(link => {
@@ -174,6 +205,23 @@
             });
         }
         
+        // Setup upload folder buttons
+        function setupUploadFolderButtons() {
+            const uploadFolderBtns = document.querySelectorAll('.upload-folder-btn');
+            uploadFolderBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const folderPath = this.getAttribute('data-path');
+                    const folderName = this.getAttribute('data-name');
+                    
+                    document.getElementById('folderPath').value = folderPath;
+                    document.getElementById('folderNamePlaceholder').textContent = folderName;
+                    
+                    const uploadFolderModal = new bootstrap.Modal(document.getElementById('uploadFolderModal'));
+                    uploadFolderModal.show();
+                });
+            });
+        }
+        
         // Upload file
         function uploadFile() {
             const form = document.getElementById('uploadForm');
@@ -189,6 +237,16 @@
                 });
                 return;
             }
+            
+            // 显示加载中提示
+            Swal.fire({
+                title: '正在上传文件',
+                text: '请稍候...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
             
             // 显式添加filePath字段
             formData.append('filePath', filePath);
@@ -208,6 +266,7 @@
                     }).then(() => {
                         bootstrap.Modal.getInstance(document.getElementById('uploadModal')).hide();
                         document.getElementById('uploadForm').reset();
+                        location.reload(); // 刷新页面显示更新后的文件
                     });
                 } else {
                     Swal.fire({
@@ -223,6 +282,81 @@
                     icon: 'error',
                     title: '上传失败',
                     text: '上传文件时发生错误。'
+                });
+            });
+        }
+        
+        // Upload folder
+        function uploadFolder() {
+            const form = document.getElementById('uploadFolderForm');
+            const formData = new FormData();
+            const folderInput = document.getElementById('folderUpload');
+            const folderPath = document.getElementById('folderPath').value;
+            
+            if (!folderInput.files[0]) {
+                Swal.fire({
+                    icon: 'error',
+                    title: '未选择文件',
+                    text: '请选择要上传的ZIP文件。'
+                });
+                return;
+            }
+            
+            // 检查是否是ZIP文件
+            const fileName = folderInput.files[0].name;
+            if (!fileName.toLowerCase().endsWith('.zip')) {
+                Swal.fire({
+                    icon: 'error',
+                    title: '文件格式错误',
+                    text: '请选择ZIP格式的文件。'
+                });
+                return;
+            }
+            
+            // 显示加载中提示
+            Swal.fire({
+                title: '正在上传文件夹',
+                text: '请稍候，文件正在上传和解压中...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            // 显式添加folderPath字段
+            formData.append('folderPath', folderPath);
+            formData.append('folder', folderInput.files[0]);
+            
+            fetch('/upload-folder/' + themeId, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '文件夹已上传',
+                        text: '文件夹已成功替换。'
+                    }).then(() => {
+                        bootstrap.Modal.getInstance(document.getElementById('uploadFolderModal')).hide();
+                        document.getElementById('uploadFolderForm').reset();
+                        location.reload(); // 刷新页面显示更新后的文件夹
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '上传失败',
+                        text: data.error || '上传过程中发生错误。'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: '上传失败',
+                    text: '上传文件夹时发生错误。'
                 });
             });
         }
@@ -329,7 +463,14 @@ function renderFileTree(items, prefix, themeId) {
         if (item.type === 'directory') {
             result += `
                 <li class="tree-folder">
-                    <span class="folder-name"><i class="bi bi-folder"></i> ${item.name}</span>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="folder-name"><i class="bi bi-folder"></i> ${item.name}</span>
+                        <button class="btn btn-sm btn-primary upload-folder-btn" 
+                            data-path="${item.path}" 
+                            data-name="${item.name}">
+                            <i class="bi bi-upload"></i> 替换文件夹
+                        </button>
+                    </div>
                     ${renderFileTree(item.children, prefix + item.name + '/', themeId)}
                 </li>
             `;

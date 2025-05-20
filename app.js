@@ -4,8 +4,20 @@ const path = require('path');
 const fs = require('fs-extra');
 const CmtGenerator = require('./cmtGenerator');
 const portfinder = require('portfinder');
+const AesUtil = require('./aesUtil');
+const extract = require('extract-zip');
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
+
+// 使用会话中间件
+const session = require('express-session');
+app.use(session({
+    secret: 'cmt-generator-secret',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: process.env.NODE_ENV === 'production' }
+}));
 
 // Set up EJS as the template engine
 app.set('view engine', 'ejs');
@@ -39,18 +51,134 @@ app.get('/', (req, res) => {
     res.render('index', { themes });
 });
 
+// 导入CMT文件功能已改为弹窗形式，不再需要单独的页面
+
+// 处理CMT文件上传和解压
+app.post('/import/cmt', async (req, res) => {
+    try {
+        if (!req.files || !req.files.cmtFile) {
+            return res.status(400).json({ error: '没有上传CMT文件' });
+        }
+
+        const cmtFile = req.files.cmtFile;
+        const fileExt = path.extname(cmtFile.name).toLowerCase();
+        
+        if (fileExt !== '.cmt') {
+            return res.status(400).json({ error: '请上传.cmt格式的文件' });
+        }
+
+        // 生成唯一ID作为导入主题的ID
+        const importedThemeId = `imported-${uuidv4()}`;
+        const tempDir = path.join(TEMP_DIR, importedThemeId);
+        const cmtFilePath = path.join(tempDir, 'original.cmt');
+        const decryptedFilePath = path.join(tempDir, 'decrypted.dcmt');
+        const extractDir = path.join(tempDir, 'theme');
+        
+        // 创建临时目录
+        await fs.ensureDir(tempDir);
+        
+        // 保存上传的CMT文件
+        await cmtFile.mv(cmtFilePath);
+        
+        // 解密CMT文件
+        await AesUtil.decryptFile(cmtFilePath, decryptedFilePath);
+        
+        // 创建解压目录
+        await fs.ensureDir(extractDir);
+        
+        // 解压文件
+        try {
+            await extract(decryptedFilePath, { dir: tempDir });
+            console.log('CMT文件解压成功');
+            
+            // 检查解压后的文件结构，确保有theme目录
+            // 有些CMT文件解压后可能直接包含主题文件，而不是在theme子目录中
+            const hasThemeDir = fs.existsSync(extractDir);
+            if (!hasThemeDir) {
+                // 如果没有theme目录，创建一个并将所有文件移动到其中
+                await fs.ensureDir(extractDir);
+                
+                // 获取tempDir中的所有文件和目录（排除theme目录本身和临时文件）
+                const items = await fs.readdir(tempDir);
+                for (const item of items) {
+                    if (item !== 'theme' && item !== 'original.cmt' && item !== 'decrypted.dcmt') {
+                        const itemPath = path.join(tempDir, item);
+                        const targetPath = path.join(extractDir, item);
+                        await fs.move(itemPath, targetPath);
+                    }
+                }
+                console.log('已将文件移动到theme目录');
+            }
+        } catch (extractError) {
+            console.error('解压文件失败:', extractError);
+            return res.status(500).json({ error: '解压CMT文件失败' });
+        }
+        
+        // 创建导入的主题对象
+        const importedTheme = {
+            id: importedThemeId,
+            name: path.basename(cmtFile.name, '.cmt'),
+            samplePath: tempDir,
+            isImported: true
+        };
+        
+        // 将导入的主题添加到会话中
+        if (!req.session) {
+            req.session = {};
+        }
+        if (!req.session.importedThemes) {
+            req.session.importedThemes = [];
+        }
+        req.session.importedThemes.push(importedTheme);
+        
+        // 重定向到主题定制页面
+        res.json({ 
+            success: true, 
+            message: 'CMT文件导入成功',
+            redirectUrl: `/theme/${importedThemeId}`
+        });
+    } catch (error) {
+        console.error('导入CMT文件失败:', error);
+        res.status(500).json({ error: '导入CMT文件失败' });
+    }
+});
+
 // Theme details page - display file tree
 app.get('/theme/:id', async (req, res) => {
     try {
         const themeId = req.params.id;
         const themes = CmtGenerator.getSampleThemes();
-        const selectedTheme = themes.find(theme => theme.id === themeId);
+        let selectedTheme = themes.find(theme => theme.id === themeId);
+        
+        // 检查是否是导入的主题
+        if (!selectedTheme && req.session && req.session.importedThemes) {
+            selectedTheme = req.session.importedThemes.find(theme => theme.id === themeId);
+        }
         
         if (!selectedTheme) {
             return res.status(404).send('Theme not found');
         }
 
-        const themeDir = path.join(selectedTheme.samplePath, 'theme');
+        // 检查是否有用户修改的工作目录
+        const themeWorkDir = path.join(TEMP_DIR, themeId);
+        const originalThemeDir = path.join(selectedTheme.samplePath, 'theme');
+        
+        let themeDir;
+        
+        // 判断是否是导入的主题
+        const isImportedTheme = selectedTheme.isImported === true;
+        
+        if (isImportedTheme) {
+            // 如果是导入的主题，始终使用theme子目录
+            themeDir = path.join(selectedTheme.samplePath, 'theme');
+            console.log(`导入的主题，使用theme目录: ${themeDir}`);
+        } else {
+            // 如果是默认主题，使用工作目录（如果存在），否则使用原始主题目录
+            themeDir = fs.existsSync(themeWorkDir) ? themeWorkDir : originalThemeDir;
+            console.log(`默认主题，使用目录: ${themeDir}`);
+        }
+        
+        // 获取文件树
         const fileTree = await CmtGenerator.getFileTree(themeDir);
         
         res.render('theme', { 
@@ -60,6 +188,125 @@ app.get('/theme/:id', async (req, res) => {
     } catch (error) {
         console.error('Error loading theme details:', error);
         res.status(500).send('Error loading theme details');
+    }
+});
+
+// 处理文件夹上传替换
+app.post('/upload-folder/:themeId', async (req, res) => {
+    try {
+        if (!req.files || !req.files.folder) {
+            console.log('上传失败: 没有上传文件夹');
+            return res.status(400).json({ error: 'No folder was uploaded' });
+        }
+
+        const themeId = req.params.themeId;
+        const folderPath = req.body.folderPath;
+        
+        // 查找主题
+        const themes = CmtGenerator.getSampleThemes();
+        let selectedTheme = themes.find(theme => theme.id === themeId);
+        
+        // 检查是否是导入的主题
+        if (!selectedTheme && req.session && req.session.importedThemes) {
+            selectedTheme = req.session.importedThemes.find(theme => theme.id === themeId);
+        }
+        
+        if (!selectedTheme) {
+            console.log(`上传失败: 未找到主题 ${themeId}`);
+            return res.status(404).json({ error: 'Theme not found' });
+        }
+
+        // 获取上传的文件夹（实际上是zip文件）
+        const uploadedFolder = req.files.folder;
+        
+        // 创建临时目录用于解压
+        const tempExtractDir = path.join(TEMP_DIR, `${themeId}_folder_extract_${Date.now()}`);
+        await fs.ensureDir(tempExtractDir);
+        
+        // 保存上传的zip文件
+        const zipFilePath = path.join(tempExtractDir, 'folder.zip');
+        await uploadedFolder.mv(zipFilePath);
+        
+        // 解压zip文件
+        try {
+            await extract(zipFilePath, { dir: tempExtractDir });
+        } catch (extractError) {
+            console.error('解压文件夹失败:', extractError);
+            await fs.remove(tempExtractDir);
+            return res.status(500).json({ error: '解压文件夹失败' });
+        }
+        
+        // 判断是否是导入的主题
+        const isImportedTheme = selectedTheme.isImported === true;
+        
+        let themeWorkDir, originalThemeDir, targetFolderPath;
+        
+        if (isImportedTheme) {
+            // 如果是导入的主题，直接使用theme目录
+            originalThemeDir = path.join(selectedTheme.samplePath, 'theme');
+            themeWorkDir = originalThemeDir; // 对于导入的主题，工作目录就是原始目录
+            targetFolderPath = path.join(themeWorkDir, folderPath);
+            console.log(`导入的主题，直接替换原始目录: ${targetFolderPath}`);
+        } else {
+            // 如果是默认主题，创建工作目录
+            themeWorkDir = path.join(TEMP_DIR, themeId);
+            originalThemeDir = path.join(selectedTheme.samplePath, 'theme');
+            
+            // 如果工作目录不存在，复制原始主题目录
+            if (!fs.existsSync(themeWorkDir)) {
+                await fs.copy(originalThemeDir, themeWorkDir);
+            }
+            
+            // 目标文件夹路径
+            targetFolderPath = path.join(themeWorkDir, folderPath);
+            console.log(`默认主题，替换工作目录: ${targetFolderPath}`);
+        }
+        
+        // 确保目标文件夹存在
+        await fs.ensureDir(path.dirname(targetFolderPath));
+        
+        // 如果目标文件夹存在，先删除它
+        if (fs.existsSync(targetFolderPath)) {
+            await fs.remove(targetFolderPath);
+        }
+        
+        // 将解压后的文件夹复制到目标位置
+        // 注意：folderPath可能是像 "3d_model" 这样的路径，我们需要找到解压后的对应文件夹
+        const folderName = path.basename(folderPath);
+        
+        // 先列出解压目录中的所有内容
+        const extractedItems = await fs.readdir(tempExtractDir);
+        console.log('解压目录内容:', extractedItems);
+        
+        // 如果解压目录中有与目标文件夹同名的文件夹，直接使用它
+        const extractedFolderPath = path.join(tempExtractDir, folderName);
+        
+        if (fs.existsSync(extractedFolderPath) && fs.statSync(extractedFolderPath).isDirectory()) {
+            console.log(`找到匹配的文件夹: ${folderName}`);
+            await fs.copy(extractedFolderPath, targetFolderPath);
+        } else {
+            console.log(`未找到匹配的文件夹: ${folderName}`);
+            // 如果没有找到匹配的文件夹，则创建目标文件夹并复制解压目录中的所有内容
+            await fs.ensureDir(targetFolderPath);
+            
+            // 复制解压目录中的所有内容到目标文件夹
+            for (const item of extractedItems) {
+                if (item !== 'folder.zip') { // 跳过原始zip文件
+                    const itemPath = path.join(tempExtractDir, item);
+                    const itemTargetPath = path.join(targetFolderPath, item);
+                    await fs.copy(itemPath, itemTargetPath);
+                }
+            }
+        }
+        
+        // 清理临时解压目录
+        await fs.remove(tempExtractDir);
+        
+        console.log(`上传成功: 主题 ${selectedTheme.name} 文件夹 ${folderPath} 已替换`);
+        res.json({ success: true, message: 'Folder replaced successfully' });
+    } catch (error) {
+        console.error('Error uploading folder:', error);
+        res.status(500).json({ error: 'Failed to upload folder' });
     }
 });
 
@@ -77,7 +324,12 @@ app.post('/upload/:themeId', async (req, res) => {
         
         // Find the theme
         const themes = CmtGenerator.getSampleThemes();
-        const selectedTheme = themes.find(theme => theme.id === themeId);
+        let selectedTheme = themes.find(theme => theme.id === themeId);
+        
+        // 检查是否是导入的主题
+        if (!selectedTheme && req.session && req.session.importedThemes) {
+            selectedTheme = req.session.importedThemes.find(theme => theme.id === themeId);
+        }
         
         if (!selectedTheme) {
             console.log(`上传失败: 未找到主题 ${themeId}`);
@@ -96,17 +348,31 @@ app.post('/upload/:themeId', async (req, res) => {
             });
         }
 
-        // Create temp theme directory if it doesn't exist
-        const themeWorkDir = path.join(TEMP_DIR, themeId);
-        const originalThemeDir = path.join(selectedTheme.samplePath, 'theme');
+        // 判断是否是导入的主题
+        const isImportedTheme = selectedTheme.isImported === true;
         
-        // Copy theme directory if it doesn't exist yet
-        if (!fs.existsSync(themeWorkDir)) {
-            await fs.copy(originalThemeDir, themeWorkDir);
+        let themeWorkDir, originalThemeDir, targetFilePath;
+        
+        if (isImportedTheme) {
+            // 如果是导入的主题，直接使用theme目录
+            originalThemeDir = path.join(selectedTheme.samplePath, 'theme');
+            themeWorkDir = originalThemeDir; // 对于导入的主题，工作目录就是原始目录
+            targetFilePath = path.join(themeWorkDir, filePath);
+            console.log(`导入的主题，直接替换原始文件: ${targetFilePath}`);
+        } else {
+            // 如果是默认主题，创建工作目录
+            themeWorkDir = path.join(TEMP_DIR, themeId);
+            originalThemeDir = path.join(selectedTheme.samplePath, 'theme');
+            
+            // 如果工作目录不存在，复制原始主题目录
+            if (!fs.existsSync(themeWorkDir)) {
+                await fs.copy(originalThemeDir, themeWorkDir);
+            }
+            
+            // 目标文件路径
+            targetFilePath = path.join(themeWorkDir, filePath);
+            console.log(`默认主题，替换工作目录文件: ${targetFilePath}`);
         }
-
-        // Save the uploaded file to the temp directory
-        const targetFilePath = path.join(themeWorkDir, filePath);
         await fs.ensureDir(path.dirname(targetFilePath));
         await uploadedFile.mv(targetFilePath);
 
@@ -122,30 +388,65 @@ app.post('/upload/:themeId', async (req, res) => {
 app.post('/generate/:themeId', async (req, res) => {
     const themeId = req.params.themeId;
     const themes = CmtGenerator.getSampleThemes();
-    const selectedTheme = themes.find(theme => theme.id === themeId);
+    let selectedTheme = themes.find(theme => theme.id === themeId);
+    
+    // 检查是否是导入的主题
+    if (!selectedTheme && req.session && req.session.importedThemes) {
+        selectedTheme = req.session.importedThemes.find(theme => theme.id === themeId);
+    }
 
     if (!selectedTheme) {
         console.log(`生成失败: 未找到主题 ${themeId}`);
         return res.status(404).json({ error: 'Theme not found' });
     }
 
-    const userModifiedDir = path.join(TEMP_DIR, themeId); // 用户修改的文件所在目录
-    const originalThemePath = path.join(selectedTheme.samplePath, 'theme'); // 原始主题目录
-    const generationSourceDir = path.join(TEMP_DIR, `${themeId}_generation_temp_${Date.now()}`);
-
+    // 判断是否是导入的主题
+    const isImportedTheme = selectedTheme.isImported === true;
+    
+    let generationSourceDir, themePath;
+    
     try {
-        // 1. 确保临时生成目录是干净的并创建它
-        await fs.remove(generationSourceDir); 
-        await fs.ensureDir(generationSourceDir);
-
-        // 2. 将原始主题完整复制到临时生成目录
-        await fs.copy(originalThemePath, generationSourceDir);
-
-        // 3. 如果用户修改的目录存在，则将其内容覆盖到临时生成目录
-        if (fs.existsSync(userModifiedDir)) {
-            await fs.copy(userModifiedDir, generationSourceDir, { overwrite: true });
+        if (isImportedTheme) {
+            // 如果是导入的主题，直接使用theme目录的父目录
+            const importedThemePath = selectedTheme.samplePath; // 导入的主题的根目录
+            generationSourceDir = path.join(TEMP_DIR, `${themeId}_generation_temp_${Date.now()}`);
+            
+            // 确保临时生成目录是干净的并创建它
+            await fs.remove(generationSourceDir);
+            await fs.ensureDir(generationSourceDir);
+            
+            // 将导入的主题目录下的theme目录内容复制到生成目录的theme目录
+            const themeSourceDir = path.join(importedThemePath, 'theme');
+            const themeTargetDir = path.join(generationSourceDir, 'theme');
+            await fs.ensureDir(themeTargetDir);
+            
+            console.log(`导入的主题，从 ${themeSourceDir} 复制到 ${themeTargetDir}`);
+            await fs.copy(themeSourceDir, themeTargetDir);
+        } else {
+            // 如果是默认主题
+            const userModifiedDir = path.join(TEMP_DIR, themeId); // 用户修改的文件所在目录
+            const originalThemePath = path.join(selectedTheme.samplePath, 'theme'); // 原始主题目录
+            generationSourceDir = path.join(TEMP_DIR, `${themeId}_generation_temp_${Date.now()}`);
+            
+            // 确保临时生成目录是干净的并创建它
+            await fs.remove(generationSourceDir);
+            await fs.ensureDir(generationSourceDir);
+            
+            // 创建 theme 目录
+            const themeDir = path.join(generationSourceDir, 'theme');
+            await fs.ensureDir(themeDir);
+            
+            // 将原始主题内容复制到临时生成目录的theme目录
+            console.log(`默认主题，从 ${originalThemePath} 复制到 ${themeDir}`);
+            await fs.copy(originalThemePath, themeDir);
+            
+            // 如果用户修改的目录存在，则将其内容覆盖到临时生成目录的theme目录
+            if (fs.existsSync(userModifiedDir)) {
+                console.log(`存在用户修改，从 ${userModifiedDir} 复制到 ${themeDir}`);
+                await fs.copy(userModifiedDir, themeDir, { overwrite: true });
+            }
         }
-
+        
         // Generate CMT file using the prepared generationSourceDir
         const outputFileName = `${selectedTheme.name.replace(/\s+/g, '_')}_theme.cmt`;
         const outputPath = path.join(OUTPUT_DIR, outputFileName);
@@ -191,7 +492,12 @@ app.get('/preview/:themeId/*', async (req, res) => {
         
         // 查找主题
         const themes = CmtGenerator.getSampleThemes();
-        const selectedTheme = themes.find(theme => theme.id === themeId);
+        let selectedTheme = themes.find(theme => theme.id === themeId);
+        
+        // 检查是否是导入的主题
+        if (!selectedTheme && req.session && req.session.importedThemes) {
+            selectedTheme = req.session.importedThemes.find(theme => theme.id === themeId);
+        }
         
         if (!selectedTheme) {
             console.log(`预览失败: 未找到主题 ${themeId}`);
@@ -202,11 +508,22 @@ app.get('/preview/:themeId/*', async (req, res) => {
         const themeWorkDir = path.join(TEMP_DIR, themeId);
         const originalThemeDir = path.join(selectedTheme.samplePath, 'theme');
         
+        // 判断是否是导入的主题
+        const isImportedTheme = selectedTheme.isImported === true;
+        
         let fullFilePath;
-        if (fs.existsSync(themeWorkDir) && fs.existsSync(path.join(themeWorkDir, filePath))) {
-            fullFilePath = path.join(themeWorkDir, filePath);
-        } else {
+        if (isImportedTheme) {
+            // 如果是导入的主题，始终从 theme 目录中获取文件
             fullFilePath = path.join(originalThemeDir, filePath);
+            console.log(`导入的主题，从 theme 目录获取文件: ${fullFilePath}`);
+        } else if (fs.existsSync(themeWorkDir) && fs.existsSync(path.join(themeWorkDir, filePath))) {
+            // 如果是默认主题且有自定义版本，使用自定义版本
+            fullFilePath = path.join(themeWorkDir, filePath);
+            console.log(`默认主题，使用自定义文件: ${fullFilePath}`);
+        } else {
+            // 否则使用原始文件
+            fullFilePath = path.join(originalThemeDir, filePath);
+            console.log(`默认主题，使用原始文件: ${fullFilePath}`);
         }
         
         if (!fs.existsSync(fullFilePath)) {
@@ -252,11 +569,23 @@ app.post('/reset/:themeId', async (req, res) => {
         const themeId = req.params.themeId;
         const themeWorkDir = path.join(TEMP_DIR, themeId);
         
+        // 检查是否是导入的主题
+        let isImportedTheme = false;
+        if (req.session && req.session.importedThemes) {
+            isImportedTheme = req.session.importedThemes.some(theme => theme.id === themeId);
+        }
+        
         if (fs.existsSync(themeWorkDir)) {
             await fs.remove(themeWorkDir);
             console.log(`重置成功: 主题 ${themeId} 已重置为默认状态`);
         } else {
             console.log(`重置提示: 主题 ${themeId} 没有自定义内容，无需重置`);
+        }
+        
+        // 如果是导入的主题，从会话中移除
+        if (isImportedTheme && req.session && req.session.importedThemes) {
+            req.session.importedThemes = req.session.importedThemes.filter(theme => theme.id !== themeId);
+            console.log(`导入的主题 ${themeId} 已从会话中移除`);
         }
         
         res.json({ success: true, message: 'Theme reset successfully' });

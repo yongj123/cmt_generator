@@ -3,7 +3,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Make folders collapsible
     document.querySelectorAll('.folder-name').forEach(folderName => {
         folderName.addEventListener('click', function() {
-            const folderItem = this.parentElement;
+            // 由于我们修改了HTML结构，需要调整父元素的查找方式
+            // 现在folder-name在div内部，而div是tree-folder的子元素
+            const folderItem = this.closest('.tree-folder');
             const folderContent = folderItem.querySelector('.tree-list');
             
             if (folderContent) {
