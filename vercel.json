@@ -7,17 +7,11 @@
     },
     {
       "src": "public/**",
-      "use": "@vercel/static",
-      "config": {
-        "zeroConfig": true
-      }
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     { "handle": "filesystem" },
-    { "src": "/css/(.*)", "dest": "/public/css/$1" },
-    { "src": "/js/(.*)", "dest": "/public/js/$1" },
-    { "src": "/favicon.ico", "dest": "/public/favicon.ico" },
     { "src": "/(.*)", "dest": "/app.js" }
   ]
 }
