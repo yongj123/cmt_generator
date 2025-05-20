@@ -10,26 +10,14 @@
       "use": "@vercel/static"
     }
   ],
-  "routes": [
-    {
-      "src": "/public/(.*)",
-      "dest": "/public/$1"
-    },
-    {
-      "src": "/js/(.*)",
-      "dest": "/public/js/$1"
-    },
-    {
-      "src": "/css/(.*)",
-      "dest": "/public/css/$1"
-    },
-    {
-      "src": "/favicon.ico",
-      "dest": "/public/favicon.ico"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/app.js"
-    }
+  "rewrites": [
+    { "source": "/public/:path*", "destination": "/public/:path*" },
+    { "source": "/js/:path*", "destination": "/public/js/:path*" },
+    { "source": "/css/:path*", "destination": "/public/css/:path*" },
+    { "source": "/favicon.png", "destination": "/public/favicon.ico" },
+    { "source": "/favicon.ico", "destination": "/public/favicon.ico" },
+    { "source": "/script.js", "destination": "/public/js/script.js" },
+    { "source": "/style.css", "destination": "/public/css/style.css" },
+    { "source": "/(.*)", "destination": "/app.js" }
   ]
 }
