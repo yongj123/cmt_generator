@@ -113,7 +113,9 @@ app.post('/import/cmt', async (req, res) => {
         }
         
         // 创建导入的主题对象 - 不再存储在会话中
-        const themeName = path.basename(cmtFile.name, '.cmt');
+        // 解决中文文件名乱码问题
+        const originalFileName = Buffer.from(cmtFile.name, 'latin1').toString('utf8');
+        const themeName = path.basename(originalFileName, '.cmt');
         
         // 直接将主题信息作为URL参数传递
         res.json({ 
