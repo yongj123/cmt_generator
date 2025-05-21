@@ -1,4 +1,5 @@
-const { put, list, get, del } = require('@vercel/blob');
+// 为避免ESM/CJS混合导入问题，使用完整导入方式
+const vercelBlob = require('@vercel/blob');
 const fs = require('fs-extra');
 const path = require('path');
 const os = require('os');
@@ -30,8 +31,7 @@ const blobService = {
     
     if (process.env.NODE_ENV === 'production') {
       // 生产环境：使用Vercel Blob Storage
-      // 免费版Vercel Blob Storage只支持public访问权限
-      const blob = await put(fullPath, content, {
+      const blob = await vercelBlob.put(fullPath, content, {
         access: 'public', // 始终使用public访问权限
       });
       
@@ -76,7 +76,7 @@ const blobService = {
   async getFile(filePath) {
     if (process.env.NODE_ENV === 'production') {
       // 生产环境：使用Vercel Blob Storage
-      return await get(filePath);
+      return await vercelBlob.get(filePath);
     } else {
       // 开发环境：使用本地文件系统
       const localPath = filePath.startsWith('file://') 
@@ -119,7 +119,7 @@ const blobService = {
   async deleteFile(filePath) {
     if (process.env.NODE_ENV === 'production') {
       // 生产环境：使用Vercel Blob Storage
-      await del(filePath);
+      await vercelBlob.del(filePath);
       return true;
     } else {
       // 开发环境：使用本地文件系统
@@ -142,7 +142,7 @@ const blobService = {
   async listFiles(prefix) {
     if (process.env.NODE_ENV === 'production') {
       // 生产环境：使用Vercel Blob Storage
-      const { blobs } = await list({ prefix });
+      const { blobs } = await vercelBlob.list({ prefix });
       return blobs;
     } else {
       // 开发环境：使用本地文件系统
