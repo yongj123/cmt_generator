@@ -34,10 +34,9 @@ app.use(fileUpload({
     },
 }));
 
-// Create temp and output directories
-// 为Vercel部署和本地开发环境提供临时目录和输出目录
-const TEMP_DIR = process.env.APP_TEMP_DIR || path.join(require('os').tmpdir(), 'cmt_generator_temp');
-const OUTPUT_DIR = process.env.APP_OUTPUT_DIR || path.join(require('os').tmpdir(), 'cmt_generator_output');
+// 创建临时和输出目录
+const TEMP_DIR = process.env.APP_TEMP_DIR || path.join(__dirname, 'temp');
+const OUTPUT_DIR = process.env.APP_OUTPUT_DIR || path.join(__dirname, 'output');
 
 console.log(`App.js using TEMP_DIR: ${TEMP_DIR}`);
 console.log(`App.js using OUTPUT_DIR: ${OUTPUT_DIR}`);
