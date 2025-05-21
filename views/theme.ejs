@@ -168,7 +168,22 @@
                     const isImage = this.getAttribute('data-is-image') === 'true';
                     const fileName = this.getAttribute('data-file-name');
                     const filePath = this.getAttribute('data-file-path');
-                    const fileUrl = `/preview/${themeId}/${filePath}`;
+                    
+                    // 获取URL参数
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const isImported = urlParams.get('imported');
+                    const themeName = urlParams.get('name');
+                    const themePath = urlParams.get('path');
+                    
+                    // 构建预览URL，并添加导入主题相关参数
+                    let fileUrl = `/preview/${themeId}/${filePath}`;
+                    
+                    // 如果是导入的主题，添加相关参数
+                    if (isImported) {
+                        fileUrl += `?imported=${isImported}`;
+                        if (themeName) fileUrl += `&name=${encodeURIComponent(themeName)}`;
+                        if (themePath) fileUrl += `&path=${encodeURIComponent(themePath)}`;
+                    }
                     
                     if (isImage) {
                         // 显示图片预览模态框
@@ -248,9 +263,22 @@
                 }
             });
             
-            // 显式添加filePath字段
+            // 显式添加必要的字段
             formData.append('filePath', filePath);
             formData.append('file', fileInput.files[0]);
+            
+            // 获取URL参数
+            const urlParams = new URLSearchParams(window.location.search);
+            const isImported = urlParams.get('imported');
+            const themeName = urlParams.get('name');
+            const themePath = urlParams.get('path');
+            
+            // 添加导入主题相关参数
+            if (isImported) {
+                formData.append('isImported', isImported);
+                formData.append('themeName', themeName);
+                formData.append('themePath', themePath);
+            }
             
             fetch('/upload/' + themeId, {
                 method: 'POST',
@@ -323,9 +351,22 @@
                 }
             });
             
-            // 显式添加folderPath字段
+            // 显式添加必要的字段
             formData.append('folderPath', folderPath);
             formData.append('folder', folderInput.files[0]);
+            
+            // 获取URL参数
+            const urlParams = new URLSearchParams(window.location.search);
+            const isImported = urlParams.get('imported');
+            const themeName = urlParams.get('name');
+            const themePath = urlParams.get('path');
+            
+            // 添加导入主题相关参数
+            if (isImported) {
+                formData.append('isImported', isImported);
+                formData.append('themeName', themeName);
+                formData.append('themePath', themePath);
+            }
             
             fetch('/upload-folder/' + themeId, {
                 method: 'POST',
@@ -374,8 +415,25 @@
                 cancelButtonText: '取消'
             }).then((result) => {
                 if (result.isConfirmed) {
+                    // 准备请求数据
+                    const formData = new FormData();
+                    
+                    // 获取URL参数
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const isImported = urlParams.get('imported');
+                    const themeName = urlParams.get('name');
+                    const themePath = urlParams.get('path');
+                    
+                    // 添加导入主题相关参数
+                    if (isImported) {
+                        formData.append('isImported', isImported);
+                        formData.append('themeName', themeName);
+                        formData.append('themePath', themePath);
+                    }
+                    
                     fetch('/reset/' + themeId, {
-                        method: 'POST'
+                        method: 'POST',
+                        body: formData
                     })
                     .then(response => response.json())
                     .then(data => {
@@ -416,8 +474,25 @@
                 didOpen: () => {
                     Swal.showLoading();
                     
+                    // 准备请求数据
+                    const formData = new FormData();
+                    
+                    // 获取URL参数
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const isImported = urlParams.get('imported');
+                    const themeName = urlParams.get('name');
+                    const themePath = urlParams.get('path');
+                    
+                    // 添加导入主题相关参数
+                    if (isImported) {
+                        formData.append('isImported', isImported);
+                        formData.append('themeName', themeName);
+                        formData.append('themePath', themePath);
+                    }
+                    
                     fetch('/generate/' + themeId, {
-                        method: 'POST'
+                        method: 'POST',
+                        body: formData
                     })
                     .then(response => response.json())
                     .then(data => {
@@ -476,7 +551,18 @@ function renderFileTree(items, prefix, themeId) {
             `;
         } else {
             const isImage = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'].includes(item.extension.toLowerCase());
-            const previewUrl = `/preview/${themeId}/${item.path}`;
+            
+            // 构建预览URL
+            let previewUrl = `/preview/${themeId}/${item.path}`;
+            
+            // 如果是导入的主题，添加相关参数
+            // 使用服务器传递的参数，而不是从浏览器窗口获取
+            if (theme.isImported) {
+                previewUrl += `?imported=true`;
+                previewUrl += `&name=${encodeURIComponent(theme.name)}`;
+                previewUrl += `&path=${encodeURIComponent(theme.samplePath)}`;
+            }
+            
             const fileIconClass = isImage ? 'bi-file-earmark-image' : 'bi-file-earmark';
             
             result += `
