@@ -82,7 +82,7 @@ class CmtGenerator {
                         walkSync(filePath, baseDir);
                     } else {
                         // 添加文件到压缩包，保持相对路径结构
-                        archive.file(filePath, { name: `theme/${relativePath}` });
+                        archive.file(filePath, { name: relativePath });
                     }
                 });
             };

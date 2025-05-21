@@ -51,9 +51,7 @@ app.get('/', (req, res) => {
     res.render('index', { themes });
 });
 
-// 导入CMT文件功能已改为弹窗形式，不再需要单独的页面
-
-// 处理CMT文件上传和解压
+// 处理CMT文件上传和解压（通过首页弹窗提交）
 app.post('/import/cmt', async (req, res) => {
     try {
         if (!req.files || !req.files.cmtFile) {
