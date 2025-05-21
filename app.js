@@ -244,7 +244,6 @@ app.post('/upload-folder/:themeId', async (req, res) => {
             originalThemeDir = path.join(selectedTheme.samplePath, 'theme');
             themeWorkDir = originalThemeDir; // 对于导入的主题，工作目录就是原始目录
             targetFolderPath = path.join(themeWorkDir, folderPath);
-            console.log(`导入的主题，直接替换原始目录: ${targetFolderPath}`);
         } else {
             // 如果是默认主题，创建工作目录
             themeWorkDir = path.join(TEMP_DIR, themeId);
@@ -257,7 +256,6 @@ app.post('/upload-folder/:themeId', async (req, res) => {
             
             // 目标文件夹路径
             targetFolderPath = path.join(themeWorkDir, folderPath);
-            console.log(`默认主题，替换工作目录: ${targetFolderPath}`);
         }
         
         // 确保目标文件夹存在
@@ -279,21 +277,17 @@ app.post('/upload-folder/:themeId', async (req, res) => {
         // 如果解压目录中有与目标文件夹同名的文件夹，直接使用它
         const extractedFolderPath = path.join(tempExtractDir, folderName);
         
-        if (fs.existsSync(extractedFolderPath) && fs.statSync(extractedFolderPath).isDirectory()) {
-            console.log(`找到匹配的文件夹: ${folderName}`);
-            await fs.copy(extractedFolderPath, targetFolderPath);
-        } else {
-            console.log(`未找到匹配的文件夹: ${folderName}`);
-            // 如果没有找到匹配的文件夹，则创建目标文件夹并复制解压目录中的所有内容
-            await fs.ensureDir(targetFolderPath);
-            
-            // 复制解压目录中的所有内容到目标文件夹
-            for (const item of extractedItems) {
-                if (item !== 'folder.zip') { // 跳过原始zip文件
-                    const itemPath = path.join(tempExtractDir, item);
-                    const itemTargetPath = path.join(targetFolderPath, item);
-                    await fs.copy(itemPath, itemTargetPath);
-                }
+        // 创建目标文件夹
+        await fs.ensureDir(targetFolderPath);
+        
+        console.log(`创建目标文件夹: ${targetFolderPath}`);
+        
+        // 直接复制解压目录中的所有内容到目标文件夹
+        for (const item of extractedItems) {
+            if (item !== 'folder.zip') { // 跳过原始zip文件
+                const itemPath = path.join(tempExtractDir, item);
+                const itemTargetPath = path.join(targetFolderPath, item);
+                await fs.copy(itemPath, itemTargetPath);
             }
         }
         
@@ -356,7 +350,6 @@ app.post('/upload/:themeId', async (req, res) => {
             originalThemeDir = path.join(selectedTheme.samplePath, 'theme');
             themeWorkDir = originalThemeDir; // 对于导入的主题，工作目录就是原始目录
             targetFilePath = path.join(themeWorkDir, filePath);
-            console.log(`导入的主题，直接替换原始文件: ${targetFilePath}`);
         } else {
             // 如果是默认主题，创建工作目录
             themeWorkDir = path.join(TEMP_DIR, themeId);
@@ -369,7 +362,6 @@ app.post('/upload/:themeId', async (req, res) => {
             
             // 目标文件路径
             targetFilePath = path.join(themeWorkDir, filePath);
-            console.log(`默认主题，替换工作目录文件: ${targetFilePath}`);
         }
         await fs.ensureDir(path.dirname(targetFilePath));
         await uploadedFile.mv(targetFilePath);
@@ -417,8 +409,7 @@ app.post('/generate/:themeId', async (req, res) => {
             const themeSourceDir = path.join(importedThemePath, 'theme');
             const themeTargetDir = path.join(generationSourceDir, 'theme');
             await fs.ensureDir(themeTargetDir);
-            
-            console.log(`导入的主题，从 ${themeSourceDir} 复制到 ${themeTargetDir}`);
+
             await fs.copy(themeSourceDir, themeTargetDir);
         } else {
             // 如果是默认主题
