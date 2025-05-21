@@ -9,8 +9,5 @@
   "routes": [
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/app.js" }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
