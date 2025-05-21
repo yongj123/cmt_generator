@@ -30,8 +30,9 @@ const blobService = {
     
     if (process.env.NODE_ENV === 'production') {
       // 生产环境：使用Vercel Blob Storage
+      // 免费版Vercel Blob Storage只支持public访问权限
       const blob = await put(fullPath, content, {
-        access: isPublic ? 'public' : 'private',
+        access: 'public', // 始终使用public访问权限
       });
       
       return {

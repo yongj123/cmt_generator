@@ -83,7 +83,7 @@ app.post('/import/cmt', async (req, res) => {
                 cmtFile.data, 
                 'original.cmt', 
                 `${importedThemeId}`,
-                false // 非公开
+                true // 使用公开访问权限
             );
             cmtFilePath = savedCmtFile.path;
             
@@ -226,7 +226,7 @@ app.post('/import/cmt', async (req, res) => {
                 JSON.stringify(themeInfo),
                 'theme-info.json',
                 importedThemeId,
-                false // 非公开
+                true // 使用公开访问权限
             );
         }
         
