@@ -574,8 +574,8 @@ app.get('/preview/:themeId/*', async (req, res) => {
         const ext = path.extname(fullFilePath).toLowerCase();
         
         console.log(`预览文件: 主题 ${selectedTheme.name} 的文件 ${filePath}`);
-        // 如果是图片文件，直接显示
-        if (['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'].includes(ext)) {
+        // 如果是图片或视频文件，直接显示
+        if (['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.mp4'].includes(ext)) {
             // 设置正确的内容类型
             if (ext === '.jpg' || ext === '.jpeg') {
                 res.setHeader('Content-Type', 'image/jpeg');
@@ -587,6 +587,8 @@ app.get('/preview/:themeId/*', async (req, res) => {
                 res.setHeader('Content-Type', 'image/bmp');
             } else if (ext === '.webp') {
                 res.setHeader('Content-Type', 'image/webp');
+            } else if (ext === '.mp4') {
+                res.setHeader('Content-Type', 'video/mp4');
             }
             
             // 读取文件并发送

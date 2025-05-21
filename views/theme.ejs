@@ -124,6 +124,24 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="videoPreviewModal" tabindex="-1" aria-labelledby="videoPreviewModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="videoPreviewModalLabel">视频预览</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <video id="previewVideo" src="" controls class="img-fluid">您的浏览器不支持视频标签</video>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                        <a id="downloadVideoLink" href="" download class="btn btn-primary">下载视频</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <footer class="bg-dark text-white py-3 mt-5">
@@ -166,6 +184,7 @@
                     e.preventDefault();
                     
                     const isImage = this.getAttribute('data-is-image') === 'true';
+                    const isVideo = this.getAttribute('data-is-video') === 'true';
                     const fileName = this.getAttribute('data-file-name');
                     const filePath = this.getAttribute('data-file-path');
                     
@@ -192,8 +211,15 @@
                         document.getElementById('downloadImageLink').href = fileUrl;
                         const imageModal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
                         imageModal.show();
+                    } else if (isVideo) {
+                        // 显示视频预览模态框
+                        document.getElementById('videoPreviewModalLabel').textContent = fileName;
+                        document.getElementById('previewVideo').src = fileUrl;
+                        document.getElementById('downloadVideoLink').href = fileUrl;
+                        const videoModal = new bootstrap.Modal(document.getElementById('videoPreviewModal'));
+                        videoModal.show();
                     } else {
-                        // 非图片文件直接下载
+                        // 非图片和视频文件直接下载
                         window.location.href = fileUrl;
                     }
                 });
@@ -551,6 +577,7 @@ function renderFileTree(items, prefix, themeId) {
             `;
         } else {
             const isImage = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'].includes(item.extension.toLowerCase());
+            const isVideo = ['.mp4'].includes(item.extension.toLowerCase());
             
             // 构建预览URL
             let previewUrl = `/preview/${themeId}/${item.path}`;
@@ -563,13 +590,15 @@ function renderFileTree(items, prefix, themeId) {
                 previewUrl += `&path=${encodeURIComponent(theme.samplePath)}`;
             }
             
-            const fileIconClass = isImage ? 'bi-file-earmark-image' : 'bi-file-earmark';
+            let fileIconClass = 'bi-file-earmark';
+            if (isImage) fileIconClass = 'bi-file-earmark-image';
+            if (isVideo) fileIconClass = 'bi-file-earmark-play';
             
             result += `
                 <li class="tree-file">
                     <span class="file-name">
                         <i class="bi ${fileIconClass}"></i> 
-                        <a href="${previewUrl}" class="file-link" data-is-image="${isImage}" data-file-name="${item.name}" data-file-path="${item.path}">${item.name}</a>
+                        <a href="${previewUrl}" class="file-link" data-is-image="${isImage}" data-is-video="${isVideo}" data-file-name="${item.name}" data-file-path="${item.path}">${item.name}</a>
                     </span>
                     <button class="btn btn-sm btn-primary upload-btn" 
                         data-path="${item.path}" 
