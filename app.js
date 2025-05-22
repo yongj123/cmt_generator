@@ -39,7 +39,7 @@ const sessionMiddleware = session({
     saveUninitialized: true,
     cookie: { 
         secure: process.env.NODE_ENV === 'production',
-        maxAge: 12 * 60 * 60 * 1000 // 12小时过期
+        maxAge: 24 * 60 * 60 * 1000 // 24小时过期
     },
     // 为了方便开发，不设置store，生产环境建议使用Redis等外部存储
     // 如需使用Redis，取消下面注释并安装connect-redis包
