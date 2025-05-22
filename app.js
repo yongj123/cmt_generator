@@ -16,7 +16,18 @@ app.use(session({
     secret: 'cmt-generator-secret',
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: process.env.NODE_ENV === 'production' }
+    cookie: { 
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 12 * 60 * 60 * 1000 // 12小时过期
+    },
+    // 为了方便开发，不设置store，生产环境建议使用Redis等外部存储
+    // 如需使用Redis，取消下面注释并安装connect-redis包
+    /*
+    store: new RedisStore({
+        host: process.env.REDIS_HOST || 'localhost',
+        port: process.env.REDIS_PORT || 6379
+    })
+    */
 }));
 
 // Set up EJS as the template engine
@@ -111,16 +122,23 @@ app.post('/import/cmt', async (req, res) => {
             return res.status(500).json({ error: '解压CMT文件失败' });
         }
         
-        // 创建导入的主题对象 - 不再存储在会话中
         // 解决中文文件名乱码问题
         const originalFileName = Buffer.from(cmtFile.name, 'latin1').toString('utf8');
         const themeName = path.basename(originalFileName, '.cmt');
         
-        // 直接将主题信息作为URL参数传递
+        // 将主题信息存储在会话中
+        req.session.importedTheme = {
+            id: importedThemeId,
+            name: themeName,
+            samplePath: tempDir,
+            isImported: true
+        };
+        
+        // 重定向到主题页面，不再通过URL传递参数
         res.json({ 
             success: true, 
             message: 'CMT文件导入成功',
-            redirectUrl: `/theme/${importedThemeId}?name=${encodeURIComponent(themeName)}&imported=true&path=${encodeURIComponent(tempDir)}`
+            redirectUrl: `/theme/${importedThemeId}`
         });
     } catch (error) {
         console.error('导入CMT文件失败:', error);
@@ -132,25 +150,12 @@ app.post('/import/cmt', async (req, res) => {
 app.get('/theme/:id', async (req, res) => {
     try {
         const themeId = req.params.id;
-        const isImported = req.query.imported === 'true';
         let selectedTheme;
         
-        if (isImported) {
-            // 从URL参数中获取导入的主题信息
-            const themeName = req.query.name || '导入的主题';
-            const themePath = req.query.path;
-            
-            if (!themePath) {
-                console.log(`导入的主题路径未提供: ${themeId}`);
-                return res.status(400).send('Theme path not provided');
-            }
-            
-            selectedTheme = {
-                id: themeId,
-                name: themeName,
-                samplePath: themePath,
-                isImported: true
-            };
+        // 检查主题ID是否以imported-开头，确定是否为导入的主题
+        if (themeId.startsWith('imported-') && req.session.importedTheme && req.session.importedTheme.id === themeId) {
+            // 从会话中获取导入的主题信息
+            selectedTheme = req.session.importedTheme;
         } else {
             // 获取默认主题
             const themes = CmtGenerator.getSampleThemes();
@@ -204,21 +209,14 @@ app.post('/upload-folder/:themeId', async (req, res) => {
 
         const themeId = req.params.themeId;
         const folderPath = req.body.folderPath;
-        const isImported = req.body.isImported === 'true';
-        const themeName = req.body.themeName;
-        const themePath = req.body.themePath;
         
         // 查找主题
         let selectedTheme;
         
-        if (isImported && themePath) {
-            // 如果是导入的主题，使用请求中提供的信息
-            selectedTheme = {
-                id: themeId,
-                name: themeName || '导入的主题',
-                samplePath: themePath,
-                isImported: true
-            };
+        // 检查主题ID是否以imported-开头，确定是否为导入的主题
+        if (themeId.startsWith('imported-') && req.session.importedTheme && req.session.importedTheme.id === themeId) {
+            // 从会话中获取导入的主题信息
+            selectedTheme = req.session.importedTheme;
         } else {
             // 如果是默认主题，从预设主题中查找
             const themes = CmtGenerator.getSampleThemes();
@@ -329,21 +327,14 @@ app.post('/upload/:themeId', async (req, res) => {
         const themeId = req.params.themeId;
         const filePath = req.body.filePath;
         const originalExtension = path.extname(filePath);
-        const isImported = req.body.isImported === 'true';
-        const themeName = req.body.themeName;
-        const themePath = req.body.themePath;
         
         // 查找主题
         let selectedTheme;
         
-        if (isImported && themePath) {
-            // 如果是导入的主题，使用请求中提供的信息
-            selectedTheme = {
-                id: themeId,
-                name: themeName || '导入的主题',
-                samplePath: themePath,
-                isImported: true
-            };
+        // 检查主题ID是否以imported-开头，确定是否为导入的主题
+        if (themeId.startsWith('imported-') && req.session.importedTheme && req.session.importedTheme.id === themeId) {
+            // 从会话中获取导入的主题信息
+            selectedTheme = req.session.importedTheme;
         } else {
             // 如果是默认主题，从预设主题中查找
             const themes = CmtGenerator.getSampleThemes();
@@ -404,21 +395,14 @@ app.post('/upload/:themeId', async (req, res) => {
 // Generate CMT file
 app.post('/generate/:themeId', async (req, res) => {
     const themeId = req.params.themeId;
-    const isImported = req.body.isImported === 'true';
-    const themeName = req.body.themeName;
-    const themePath = req.body.themePath;
     
     // 查找主题
     let selectedTheme;
     
-    if (isImported && themePath) {
-        // 如果是导入的主题，使用请求中提供的信息
-        selectedTheme = {
-            id: themeId,
-            name: themeName || '导入的主题',
-            samplePath: themePath,
-            isImported: true
-        };
+    // 检查主题ID是否以imported-开头，确定是否为导入的主题
+    if (themeId.startsWith('imported-') && req.session.importedTheme && req.session.importedTheme.id === themeId) {
+        // 从会话中获取导入的主题信息
+        selectedTheme = req.session.importedTheme;
     } else {
         // 如果是默认主题，从预设主题中查找
         const themes = CmtGenerator.getSampleThemes();
@@ -518,21 +502,14 @@ app.get('/preview/:themeId/*', async (req, res) => {
     try {
         const themeId = req.params.themeId;
         const filePath = req.params[0]; // 获取匹配/*的所有路径部分
-        const isImported = req.query.imported === 'true';
-        const themeName = req.query.name;
-        const themePath = req.query.path;
         
         // 查找主题
         let selectedTheme;
         
-        if (isImported && themePath) {
-            // 如果是导入的主题，使用请求中提供的信息
-            selectedTheme = {
-                id: themeId,
-                name: themeName || '导入的主题',
-                samplePath: themePath,
-                isImported: true
-            };
+        // 检查主题ID是否以imported-开头，确定是否为导入的主题
+        if (themeId.startsWith('imported-') && req.session.importedTheme && req.session.importedTheme.id === themeId) {
+            // 从会话中获取导入的主题信息
+            selectedTheme = req.session.importedTheme;
         } else {
             // 如果是默认主题，从预设主题中查找
             const themes = CmtGenerator.getSampleThemes();
@@ -609,8 +586,10 @@ app.get('/preview/:themeId/*', async (req, res) => {
 app.post('/reset/:themeId', async (req, res) => {
     try {
         const themeId = req.params.themeId;
-        const themePath = req.body.themePath;
-        const isImported = req.body.isImported === 'true';
+        
+        // 检查主题ID是否以imported-开头，确定是否为导入的主题
+        const isImported = themeId.startsWith('imported-') && req.session.importedTheme && req.session.importedTheme.id === themeId;
+        const themePath = isImported ? req.session.importedTheme.samplePath : null;
         
         // 如果是导入的主题，需要重新解压
         if (isImported && themePath) {
