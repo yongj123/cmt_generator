@@ -10,9 +10,30 @@ const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 
+// 定义清理临时文件的函数
+const cleanupTempDir = async () => {
+  try {
+    console.log('清理temp文件夹...');
+    
+    // 确保目录存在
+    if (!fs.existsSync(TEMP_DIR)) return;
+    
+    const items = await fs.readdir(TEMP_DIR);
+    
+    for (const item of items) {
+      const itemPath = path.join(TEMP_DIR, item);
+      await fs.remove(itemPath);
+    }
+    
+    console.log('temp文件夹清理完成');
+  } catch (error) {
+    console.error('清理temp文件夹时出错:', error);
+  }
+};
+
 // 使用会话中间件
 const session = require('express-session');
-app.use(session({
+const sessionMiddleware = session({
     secret: 'cmt-generator-secret',
     resave: false,
     saveUninitialized: true,
@@ -28,7 +49,22 @@ app.use(session({
         port: process.env.REDIS_PORT || 6379
     })
     */
-}));
+});
+
+app.use(sessionMiddleware);
+
+// 添加会话事件监听中间件
+app.use((req, res, next) => {
+    // 如果是新会话，清理temp文件夹
+    if (req.session && req.session.isNew) {
+        console.log(`新会话创建: ${req.session.id}`);
+        cleanupTempDir().catch(err => console.error('清理temp文件夹失败:', err));
+    }
+    
+    next();
+});
+
+
 
 // Set up EJS as the template engine
 app.set('view engine', 'ejs');
@@ -133,7 +169,7 @@ app.post('/import/cmt', async (req, res) => {
             samplePath: tempDir,
             isImported: true
         };
-        
+
         // 重定向到主题页面，不再通过URL传递参数
         res.json({ 
             success: true, 
@@ -651,6 +687,17 @@ app.post('/reset/:themeId', async (req, res) => {
     }
 });
 
+// 添加手动清理路由，用于管理员清理临时文件
+app.get('/admin/cleanup', async (req, res) => {
+    try {
+        await cleanupTempDir();
+        res.json({ success: true, message: 'temp文件夹清理成功' });
+    } catch (error) {
+        console.error('清理temp文件夹失败:', error);
+        res.status(500).json({ error: '清理temp文件夹失败' });
+    }
+});
+
 // Start the server
 const startServer = async () => {
     let portToListenOn;
@@ -663,7 +710,7 @@ const startServer = async () => {
             return;
         }
     } else {
-        // Not running on Vercel or similar (no process.env.PORT), find a port for local dev
+        // 查找可用端口
         try {
             portToListenOn = await portfinder.getPortPromise({
                 port: 3333,    // Default port to start searching from
